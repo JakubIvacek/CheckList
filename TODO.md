@@ -3,6 +3,7 @@
 Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 
 ## Funkcie
+- [ ] **Účet / Nastavenia stránka** — profil (email), odhlásenie, prepínač jazyka, správa kategórií, (zmena hesla, svetlý/tmavý režim) na jednom mieste.
 - [ ] **Prehadzovanie poradia taskov** (drag & drop v rámci dňa).
   - Vyžaduje nový stĺpec `position int` v tabuľke `tasks` (Supabase) + radenie podľa neho.
 - [ ] **Poznámka k úlohe** — pole `note` v DB už existuje, len doplniť do UI (úprava úlohy).
@@ -10,14 +11,16 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 - [ ] **Opakujúce sa úlohy** (denne / týždenne).
 - [ ] **Vyhľadávanie úloh.**
 
+## Bugy / opravy
+- [ ] **Kalendár — „Dnes" v ročnom zobrazení** neskočí na aktuálny rok/mesiac. Opraviť, nech `goToday` v `year` režime odscrolluje na aktuálny rok (a ideálne zvýrazní/otvorí aktuálny mesiac), rovnako ako to funguje v mesačnom zobrazení.
+
 ## Polish
 - [ ] **Potvrdenie pred zmazaním kategórie** (teraz maže okamžite).
 - [ ] **Prázdne stavy** — jemné hlášky, keď nie sú žiadne úlohy / kategórie / dáta v štatistikách.
-- [ ] **Nastavenia / účet** — jedna obrazovka (odhlásenie, jazyk, správa kategórií).
 - [ ] Manuálny prepínač svetlý / tmavý režim (teraz podľa systému).
 
 ## Pred ostrým nasadením
-- [ ] **PWA ikony** — `pwa-192.png`, `pwa-512.png` chýbajú → inštalovateľná appka.
+- [ ] **PWA ikony (PNG)** — appka je už inštalovateľná cez `stride_icon.svg`, ale doplniť aj `pwa-192.png` / `pwa-512.png` (+ maskable) pre platformy, čo nemajú radi SVG.
 - [ ] **Supabase URL Configuration** — Site URL + Redirect URLs (aj produkčná doména) pre reset hesla a OAuth.
 - [ ] Google OAuth — zapnúť provider v Supabase + nastaviť credentials (ak chceme Google login naživo).
 - [ ] Zvážiť vypnutie „Confirm email" alebo nastaviť vlastné SMTP.
