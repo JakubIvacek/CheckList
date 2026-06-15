@@ -1,9 +1,9 @@
 /* Tracker — global design system (Apple-clean). Light + dark mode. */
 :root{
-  --color-background-primary:#ffffff;
-  --color-background-secondary:#f2f2f7;
-  --color-background-tertiary:#e6e6eb;
-  --color-background-info:#ffe9e7;
+  --color-background-primary:#f5f5f7;
+  --color-background-secondary:#eaeaef;
+  --color-background-tertiary:#dedee4;
+  --color-background-info:#ffe4e1;
   --color-text-primary:#1c1c1e;
   --color-text-secondary:#6e6e73;
   --color-text-tertiary:#aeaeb2;

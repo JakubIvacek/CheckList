@@ -21,7 +21,7 @@
       <template #item="{ element: task }">
         <div class="day-item">
           <!-- edit mode -->
-          <div v-if="editingId === task.id" class="add-form">
+          <div v-if="editingId === task.id" class="add-form edit-form">
             <div class="add-input-row">
               <input
                 ref="editEl"
@@ -273,6 +273,12 @@ defineExpose({ openAdd })
 .date-input:focus { outline: none; border-color: var(--color-text-info); }
 
 .add-form { display: flex; flex-direction: column; gap: 8px; padding: 6px 0; }
+.edit-form {
+  border-top: 0.5px solid var(--color-border-secondary);
+  border-bottom: 0.5px solid var(--color-border-secondary);
+  margin: 4px 0;
+  padding: 12px 0;
+}
 .add-input-row { display: flex; align-items: center; gap: 8px; }
 .add-input {
   flex: 1;
