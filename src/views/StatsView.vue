@@ -29,9 +29,9 @@
       </div>
     </div>
 
-    <!-- weekly bar chart -->
+    <!-- period bar chart -->
     <section class="block">
-      <div class="block-title">Hotové po týždňoch</div>
+      <div class="block-title">{{ chartTitle }}</div>
       <div class="chart-wrap">
         <Bar :data="chartData" :options="chartOptions" />
       </div>
@@ -68,8 +68,10 @@ import { useTasksStore } from '@/stores/tasks'
 import { useCategoriesStore } from '@/stores/categories'
 import CategoriesSheet from '@/components/CategoriesSheet.vue'
 import {
-  DAY_NAMES, addDays, getMonday, isoWeekKey, parseYmd, today, weekdayIndex, ymd,
+  DAY_LETTERS, DAY_NAMES, addDays, getMonday, parseYmd, today, weekdayIndex, ymd,
 } from '@/lib/dates'
+
+const MONTHS_SHORT = ['jan', 'feb', 'mar', 'apr', 'máj', 'jún', 'júl', 'aug', 'sep', 'okt', 'nov', 'dec']
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
@@ -155,18 +157,42 @@ const longestStreak = computed(() => {
   return best
 })
 
-// --- last 6 weeks chart ---
-const weeks = computed(() => {
-  const mondayThis = getMonday(todayStr)
-  const list = []
-  for (let i = 5; i >= 0; i--) {
-    const mon = addDays(mondayThis, -7 * i)
-    const key = isoWeekKey(mon)
-    const done = tasksStore.tasks.filter(
-      t => t.status === 'done' && t.task_date >= mon && t.task_date <= addDays(mon, 6),
-    ).length
-    const md = parseYmd(mon)
-    list.push({ key, label: `${md.getDate()}.${md.getMonth() + 1}`, done, isCurrent: i === 0 })
+// --- chart adapts to the selected period ---
+const chartTitle = computed(() =>
+  period.value === 'week' ? 'Hotové po dňoch'
+    : period.value === 'month' ? 'Hotové po týždňoch'
+      : 'Hotové po mesiacoch')
+
+function doneBetween(from: string, to: string) {
+  return tasksStore.tasks.filter(t => t.status === 'done' && t.task_date >= from && t.task_date <= to).length
+}
+
+const buckets = computed(() => {
+  const list: { label: string; done: number; isCurrent: boolean }[] = []
+  if (period.value === 'week') {
+    // current week, day by day (Po–Ne)
+    const mon = getMonday(todayStr)
+    for (let i = 0; i < 7; i++) {
+      const d = addDays(mon, i)
+      list.push({ label: DAY_LETTERS[i], done: doneBetween(d, d), isCurrent: d === todayStr })
+    }
+  } else if (period.value === 'month') {
+    // last 6 weeks
+    const mondayThis = getMonday(todayStr)
+    for (let i = 5; i >= 0; i--) {
+      const mon = addDays(mondayThis, -7 * i)
+      const md = parseYmd(mon)
+      list.push({ label: `${md.getDate()}.${md.getMonth() + 1}`, done: doneBetween(mon, addDays(mon, 6)), isCurrent: i === 0 })
+    }
+  } else {
+    // 12 months of the current year
+    const d = parseYmd(todayStr)
+    const y = d.getFullYear(), curM = d.getMonth()
+    for (let m = 0; m < 12; m++) {
+      const from = ymd(new Date(y, m, 1))
+      const to = ymd(new Date(y, m + 1, 0))
+      list.push({ label: MONTHS_SHORT[m], done: doneBetween(from, to), isCurrent: m === curM })
+    }
   }
   return list
 })
@@ -175,10 +201,10 @@ const chartData = computed(() => {
   const success = cssVar('--color-text-success') || '#34c759'
   const danger = cssVar('--color-text-danger') || '#ff3b30'
   return {
-    labels: weeks.value.map(w => w.label),
+    labels: buckets.value.map(b => b.label),
     datasets: [{
-      data: weeks.value.map(w => w.done),
-      backgroundColor: weeks.value.map(w => w.isCurrent ? danger : success),
+      data: buckets.value.map(b => b.done),
+      backgroundColor: buckets.value.map(b => b.isCurrent ? danger : success),
       borderRadius: 5,
       borderSkipped: false,
       barPercentage: 0.6,
@@ -197,7 +223,7 @@ const chartOptions = computed(() => {
       x: {
         grid: { display: false, drawBorder: false },
         ticks: {
-          color: weeks.value.map(w => w.isCurrent ? danger : tertiary),
+          color: buckets.value.map(b => b.isCurrent ? danger : tertiary),
           font: { size: 11 },
         },
       },
