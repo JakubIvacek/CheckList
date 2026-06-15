@@ -1,6 +1,9 @@
 <template>
   <header class="app-header">
-    <img src="/stride_icon.svg" alt="Stride" class="app-logo">
+    <div class="app-brand">
+      <img src="/stride_icon.svg" alt="Stride" class="app-logo">
+      <span class="app-name">Stride</span>
+    </div>
     <div class="app-actions">
       <LanguageSwitch />
       <RouterLink to="/account" class="settings" :aria-label="t('account.title')">
@@ -26,7 +29,9 @@ const { t } = useI18n()
   justify-content: space-between;
   padding: 12px 18px 8px;
 }
+.app-brand { display: flex; align-items: center; gap: 9px; }
 .app-logo { height: 26px; width: auto; filter: var(--logo-filter); }
+.app-name { font-size: 19px; font-weight: 600; letter-spacing: -0.5px; color: var(--color-text-primary); }
 .app-actions { display: flex; align-items: center; gap: 8px; }
 .settings {
   text-decoration: none;
