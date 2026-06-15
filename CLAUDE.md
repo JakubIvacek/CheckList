@@ -1,6 +1,8 @@
-# CLAUDE.md — Tracker
+# CLAUDE.md — Stride
 
-Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal app (single user uses it, but multi-user via auth).
+Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal app (single user uses it, but multi-user via auth). Branded **Stride** (logos in `public/stride_*.svg`); the repo/folder is historically named "CheckList"/"Tracker".
+
+> The app is largely built. See **`TODO.md`** for the backlog/ideas and what's done. This file is the durable spec + conventions; keep it accurate when behaviour changes.
 
 ## Stack
 
@@ -10,6 +12,17 @@ Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal ap
 - `vite-plugin-pwa` (installable, offline app shell)
 - Supabase (Postgres + Auth + auto REST API) — this is the entire backend, no custom server
 - Chart.js via `vue-chartjs` (Stats screen only)
+- `vue-i18n` (EN/SK, default EN) — all UI strings go through it
+- `vuedraggable` (SortableJS) — drag & drop task reorder
+
+## Dev setup (new machine)
+
+1. `npm install`
+2. Create `.env.local` with `VITE_SUPABASE_URL` + `VITE_SUPABASE_ANON_KEY` (Supabase → Project Settings → API). `.env.local` is gitignored.
+3. `npm run dev` → http://localhost:5173
+4. **Demo mode**: in dev the app shows generated demo data without login (`src/lib/demo.ts`, `isDemo = DEV && VITE_DEMO !== 'false'`). To use real Supabase data in dev, set `VITE_DEMO=false` in `.env.local`. Production build always uses real data.
+5. `npm run build` runs `vue-tsc` (v2) + `vite build`; must stay green.
+6. DB: run the SQL in `README.md` (incl. the `position` migration) on a fresh Supabase project.
 
 ## Architecture
 
@@ -22,29 +35,34 @@ Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal ap
 
 ## Data model (already created in Supabase, see README.md for SQL)
 
-- `tasks`: `id, user_id, title, task_date (date), status ('todo'|'done'), category_id (nullable FK), note, created_at, completed_at`
+- `tasks`: `id, user_id, title, task_date (date), status ('todo'|'done'), category_id (nullable FK), note, position (int), created_at, completed_at`
 - `categories`: `id, user_id, name, color, created_at`
 - Notes:
   - Column is `task_date`, NOT `date` (reserved word).
-  - `category_id` is nullable — v1 works without categories. Categories + their colors get turned on later; the model is already ready (no migration needed).
+  - `category_id` is nullable. Categories are **active** (CRUD + colors + filter implemented).
+  - `position` orders tasks within a day (drag & drop); store sets it on add and on reorder. New DBs: run the `position` migration in `README.md`.
   - `completed_at` is set **app-side** on toggle (store sets `new Date().toISOString()` when status → done, `null` when → todo). No DB trigger.
   - Weeks are NOT stored. Group by ISO week over `task_date`; charts aggregate over the same column. Index `(user_id, task_date)` covers week/month range queries.
 
 ## Conventions
 
-- UI labels in **Slovak** (Domov / Kalendár / Štatistiky, day names Pondelok…Nedeľa, months Január…December).
+- **i18n:** all UI strings go through `vue-i18n` (`src/i18n/messages.ts`, EN + SK, **default EN**). Never hardcode user-facing text — add a key. Dates/day/month names are localized via the `useFmt()` composable (`src/i18n/dates.ts`) using `Intl`. Category/task names are user data, not translated.
 - Week starts **Monday** (po ut st št pi so ne).
+- **Bootstrap class-name collisions:** `bootstrap.css` is global, so DO NOT use these as custom class names — they break layout (`.row > *` forces full-width, `.card/.progress/.nav` add styles): `.row .col .nav .card .progress .container .badge .btn .form-control`. Use prefixed names (`.trow`, `.ac-card`, `.metric`, `.wk-progress`…). If a flex row mysteriously stacks vertically, suspect this first.
+- **Theme:** light/dark via `data-theme` on `<html>` + `localStorage` (`src/lib/theme.ts`); default follows system. Palettes + `--logo-filter` + `color-scheme` live in `src/styles/app.css` (dark block duplicated for system-dark and `[data-theme=dark]`).
+- **Brand accent:** `--color-text-info` is the logo red (`#ff2d20`), used for primary actions/active tab (not blue).
 - Prefer targeted, incremental edits over rewrites.
 - Keep code/answers concise.
-- Date strings are `'YYYY-MM-DD'` throughout.
+- Date strings are `'YYYY-MM-DD'` throughout (local, via `src/lib/dates.ts`).
 
 ## Design system (Apple-clean)
 
 - System font stack (`-apple-system, SF Pro, Inter, system-ui`). Lots of whitespace, subtle grays, hairline `0.5px` borders, generous corner radii.
-- Bottom tab bar with 3 tabs: Domov (home icon), Kalendár (calendar), Štatistiky (chart-bar). Active tab = blue (`--color-text-info`).
+- Persistent top header (`AppHeader.vue`, **outside** the scroll area) = Stride logo + name, language switch, settings/account gear. Bottom tab bar with 3 tabs: Domov, Štatistiky, Kalendár. Active tab = brand red (`--color-text-info`).
 - Icons: Tabler outline webfont (`<i class="ti ti-...">`).
 - Two font weights only: 400 and 500. Sentence case. No emoji.
-- Color tokens + dark mode are defined in `design/app.css`. Reuse those values when building the real Bootstrap views (or map them to CSS vars / SCSS).
+- Color tokens + light/dark are defined in `src/styles/app.css` (imported in `main.ts`). `design/*.html` are the original static mockups for reference.
+- Desktop (≥600px): the app shows as a centered ~480px boxed column (side hairlines + soft shadow), gray background around.
 
 ### Color logic (THE important rule — same across all screens)
 

@@ -1,6 +1,25 @@
-# Stride - Weekly Task Management PWA
+# Stride — Weekly Task Management PWA
 
-Vue 3 + Supabase aplikácia na spravovanie úloh s offline podporou (PWA).
+Apple-clean, mobile-first týždenná appka na úlohy. Vue 3 + Supabase, inštalovateľná ako PWA.
+
+<p align="center">
+  <img src="docs/screenshot-home.png" width="260" alt="Domov">
+  <img src="docs/screenshot-stats.png" width="260" alt="Štatistiky">
+  <img src="docs/screenshot-calendar.png" width="260" alt="Kalendár">
+</p>
+
+## Funkcie
+
+- **Domov** — týždenný prehľad (Po–Ne), pridávanie/odškrtávanie úloh, progres, mini graf, swipe medzi týždňami, zbaľovacia hlavička.
+- **Úlohy** — úprava (názov, poznámka, kategória), **drag & drop poradie**, **presun na iný deň**, potvrdenie pred zmazaním.
+- **Kalendár** — mesiac + rok (nekonečný scroll), stav dní farebne, detail dňa.
+- **Štatistiky** — Týždeň/Mesiac/Rok, metriky + streaky, graf, rozpad podľa kategórie, **GitHub-style heatmapa** aktivity.
+- **Kategórie** — CRUD + farby, filter, tvorba priamo pri pridávaní úlohy.
+- **Účet** — email/heslo + Google, reset hesla, jazyk **EN/SK**, téma **systém/svetlá/tmavá**.
+
+## Stack
+
+Vue 3 · Vite · TypeScript · Pinia · Vue Router · Bootstrap (utilities) · vue-i18n · vuedraggable · Chart.js · `vite-plugin-pwa` · **Supabase** (Postgres + Auth + RLS, jediný backend).
 
 ## Setup Supabase
 
@@ -72,27 +91,35 @@ npm install
 npm run dev
 ```
 
-Dev server běží na `http://localhost:5173`.
+Dev server beží na `http://localhost:5173`.
+
+### Demo režim
+
+V deve appka ukazuje vygenerované dáta **bez prihlásenia** (`src/lib/demo.ts`). Pre reálne Supabase dáta v deve daj `VITE_DEMO=false` do `.env.local`. Produkčný build vždy používa reálne dáta.
 
 ## Build
 
 ```bash
-npm run build
+npm run build   # vue-tsc + vite build
 ```
 
 ## Štruktúra
 
-- `src/main.ts` - Entry point
-- `src/stores/` - Pinia stores (auth, tasks)
-- `src/views/` - Stránky (Home, Calendar, Stats)
-- `src/components/` - Komponenty (TabBar, DayList)
-- `src/lib/supabase.ts` - Supabase client
-- `src/types/index.ts` - TypeScript typy
+- `src/views/` — `HomeView`, `CalendarView`, `StatsView`, `AccountView`, `AuthView`
+- `src/components/` — `AppHeader`, `TabBar`, `DayList`, `CategoryPicker`, `CategoriesSheet`, `LanguageSwitch`
+- `src/stores/` — Pinia: `tasks`, `categories`, `auth`
+- `src/lib/` — `supabase`, `dates`, `status`, `colors`, `theme`, `demo`
+- `src/i18n/` — `messages` (EN/SK), `dates` (lokalizované formáty)
+- `src/styles/app.css` — dizajn tokeny + light/dark
 
 ## Autentifikácia
 
-Aplikácia používa Google OAuth cez Supabase Auth. Nastav OAuth app v Supabase Authentication → Providers → Google.
+Email/heslo + **Google OAuth** cez Supabase Auth. Google: zapni v Authentication → Providers → Google. Po nasadení pridaj produkčnú doménu do Authentication → URL Configuration (Site URL + Redirect URLs) kvôli OAuth a resetu hesla.
 
 ## PWA
 
-Aplikácia sa dá nainštalovať ako PWA a pracuje offline (service worker cachuje app shell). Ikony PWA: `pwa-192.png`, `pwa-512.png`.
+Inštalovateľná, service worker cachuje app shell. Ikona je `public/stride_icon.svg`; pre niektoré platformy sa hodí doplniť aj `pwa-192.png` / `pwa-512.png`.
+
+---
+
+Ďalšie nápady a backlog: pozri **`TODO.md`**.
