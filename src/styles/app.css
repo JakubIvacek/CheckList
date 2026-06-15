@@ -14,9 +14,11 @@
   --color-border-secondary:rgba(60,60,67,0.22);
   --border-radius-md:8px;
   --border-radius-lg:12px;
+  --logo-filter:none;
 }
+/* dark palette, shared by system-dark (no manual override) and manual dark */
 @media (prefers-color-scheme: dark){
-  :root{
+  :root:not([data-theme]){
     --color-background-primary:#1c1c1e;
     --color-background-secondary:#2c2c2e;
     --color-background-tertiary:#3a3a3c;
@@ -29,7 +31,23 @@
     --color-text-info:#ff5247;
     --color-border-tertiary:rgba(235,235,245,0.14);
     --color-border-secondary:rgba(235,235,245,0.24);
+    --logo-filter:invert(1) hue-rotate(180deg);
   }
+}
+:root[data-theme="dark"]{
+  --color-background-primary:#1c1c1e;
+  --color-background-secondary:#2c2c2e;
+  --color-background-tertiary:#3a3a3c;
+  --color-background-info:#3a1714;
+  --color-text-primary:#f2f2f7;
+  --color-text-secondary:#98989d;
+  --color-text-tertiary:#6c6c70;
+  --color-text-success:#30d158;
+  --color-text-danger:#ff453a;
+  --color-text-info:#ff5247;
+  --color-border-tertiary:rgba(235,235,245,0.14);
+  --color-border-secondary:rgba(235,235,245,0.24);
+  --logo-filter:invert(1) hue-rotate(180deg);
 }
 
 *{box-sizing:border-box;}

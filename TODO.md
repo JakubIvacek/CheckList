@@ -3,7 +3,6 @@
 Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 
 ## Funkcie
-- [ ] **Účet / Nastavenia stránka** — profil (email), odhlásenie, prepínač jazyka, správa kategórií, (zmena hesla, svetlý/tmavý režim) na jednom mieste.
 - [ ] **Prehadzovanie poradia taskov** (drag & drop v rámci dňa).
   - Vyžaduje nový stĺpec `position int` v tabuľke `tasks` (Supabase) + radenie podľa neho.
 - [ ] **Poznámka k úlohe** — pole `note` v DB už existuje, len doplniť do UI (úprava úlohy).
@@ -17,7 +16,6 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 ## Polish
 - [ ] **Potvrdenie pred zmazaním kategórie** (teraz maže okamžite).
 - [ ] **Prázdne stavy** — jemné hlášky, keď nie sú žiadne úlohy / kategórie / dáta v štatistikách.
-- [ ] Manuálny prepínač svetlý / tmavý režim (teraz podľa systému).
 
 ## Pred ostrým nasadením
 - [ ] **PWA ikony (PNG)** — appka je už inštalovateľná cez `stride_icon.svg`, ale doplniť aj `pwa-192.png` / `pwa-512.png` (+ maskable) pre platformy, čo nemajú radi SVG.
@@ -26,6 +24,8 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 - [ ] Zvážiť vypnutie „Confirm email" alebo nastaviť vlastné SMTP.
 
 ## Hotovo
+- [x] Účet / Nastavenia stránka — email, jazyk, téma (Systém/Svetlý/Tmavý), správa kategórií, zmena hesla, odhlásenie; ikona nastavení v hlavičke.
+- [x] Manuálny prepínač svetlý / tmavý režim (`data-theme` + localStorage, default systém).
 - [x] Viacjazyčnosť (i18n) — `vue-i18n`, prepínač EN/SK, predvolene Angličtina, lokalizované dátumy, voľba uložená v localStorage.
 - [x] Apple-clean redesign (Domov, Kalendár, Štatistiky, TabBar).
 - [x] Kalendár — mesiac + rok + day-detail sheet.

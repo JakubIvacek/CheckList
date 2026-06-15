@@ -7,5 +7,6 @@ export default createRouter({
     { path: '/', name: 'home', component: HomeView },
     { path: '/calendar', name: 'calendar', component: () => import('@/views/CalendarView.vue') },
     { path: '/stats', name: 'stats', component: () => import('@/views/StatsView.vue') },
+    { path: '/account', name: 'account', component: () => import('@/views/AccountView.vue') },
   ],
 })

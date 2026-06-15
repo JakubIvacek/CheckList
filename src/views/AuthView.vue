@@ -210,11 +210,8 @@ function translate(msg: string): string {
 .auth-lang { display: flex; justify-content: flex-end; margin-bottom: 4px; }
 
 .brand { text-align: center; margin-bottom: 22px; }
-.brand-logo { width: 270px; height: auto; margin: 0 auto 10px; display: block; }
+.brand-logo { width: 270px; height: auto; margin: 0 auto 10px; display: block; filter: var(--logo-filter); }
 .brand-sub { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; }
-@media (prefers-color-scheme: dark) {
-  .brand-logo { filter: invert(1) hue-rotate(180deg); }
-}
 
 .heading { font-size: 17px; font-weight: 500; margin-bottom: 16px; text-align: center; }
 

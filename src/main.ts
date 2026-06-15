@@ -5,6 +5,9 @@ import './styles/app.css'
 import App from './App.vue'
 import router from './router'
 import { i18n } from './i18n'
+import { applyTheme, getTheme } from './lib/theme'
+
+applyTheme(getTheme())
 
 const app = createApp(App)
 
