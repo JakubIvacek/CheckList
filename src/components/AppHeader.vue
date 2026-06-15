@@ -31,7 +31,7 @@ const { t } = useI18n()
 }
 .app-brand { display: flex; align-items: center; gap: 9px; }
 .app-logo { height: 26px; width: auto; filter: var(--logo-filter); }
-.app-name { font-size: 19px; font-weight: 600; letter-spacing: -0.5px; color: var(--color-text-primary); }
+.app-name { font-size: 19px; font-weight: 600; letter-spacing: -0.5px; color: var(--color-text-primary); position: relative; top: -2px; }
 .app-actions { display: flex; align-items: center; gap: 8px; }
 .settings {
   text-decoration: none;

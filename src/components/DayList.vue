@@ -260,7 +260,7 @@ defineExpose({ openAdd })
 .drag-ghost { opacity: 0.4; }
 
 .edit-date {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  display: flex; align-items: center; gap: 10px;
   font-size: 14px; color: var(--color-text-secondary);
 }
 .date-input {

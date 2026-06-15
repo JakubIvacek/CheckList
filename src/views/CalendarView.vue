@@ -51,7 +51,7 @@
       <section v-for="y in years" :key="y" class="year-block">
         <div class="year-heading">{{ y }}</div>
         <div class="yr2">
-          <div v-for="(mo, mi) in 12" :key="mi">
+          <div v-for="(mo, mi) in 12" :key="mi" :ref="el => registerCur(y, mi, el)">
             <button class="yr2-lab" :class="{ cur: y === todayY && mi === todayM }" @click="openMonth(y, mi)">
               {{ fmt.monthName(mi) }}
             </button>
@@ -155,6 +155,15 @@ function registerMonth(key: string, el: unknown) {
   if (el) monthEls.set(key, (el as { $el?: HTMLElement }).$el ?? (el as HTMLElement))
 }
 
+// remember the current month's cell in the year grid so "Today" can scroll to it
+const curMonthEl = ref<HTMLElement | null>(null)
+function registerCur(year: number, month: number, el: unknown) {
+  if (el && year === todayY && month === todayM) curMonthEl.value = el as HTMLElement
+}
+function scrollToCurrentInYear() {
+  nextTick(() => curMonthEl.value?.scrollIntoView({ block: 'center' }))
+}
+
 const sheetTasks = computed(() =>
   sheetDate.value
     ? tasksStore.tasks.filter(t => t.task_date === sheetDate.value).sort((a, b) => a.position - b.position)
@@ -162,7 +171,10 @@ const sheetTasks = computed(() =>
 const sheetTitle = computed(() => (sheetDate.value ? fmt.fullDate(sheetDate.value) : ''))
 
 function openDay(date: string) { sheetDate.value = date }
-function setMode(m: 'month' | 'year') { mode.value = m }
+function setMode(m: 'month' | 'year') {
+  mode.value = m
+  if (m === 'year') scrollToCurrentInYear()
+}
 
 function openMonth(year: number, month: number) {
   anchor.value = { year, month }
@@ -180,6 +192,7 @@ function goToday() {
     nextTick(() => scrollToMonth(`${todayY}-${todayM}`))
   } else {
     yearAnchor.value = todayY
+    scrollToCurrentInYear()
   }
 }
 
