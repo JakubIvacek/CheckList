@@ -246,8 +246,10 @@ defineExpose({ openAdd })
 
 .delete-btn {
   display: flex; align-items: center; gap: 6px;
-  border: none; background: none; cursor: pointer;
-  color: var(--color-text-danger); font-size: 13px; padding: 2px 0;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-primary); cursor: pointer;
+  color: var(--color-text-danger); font-size: 14px;
+  height: 34px; padding: 0 12px; border-radius: var(--border-radius-md);
 }
 .delete-btn i { font-size: 16px; }
 
@@ -261,7 +263,7 @@ defineExpose({ openAdd })
 .drag-handle:active { cursor: grabbing; }
 .drag-ghost { opacity: 0.4; }
 
-.edit-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.edit-bottom { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; padding-left: 5px; }
 .edit-date {
   display: flex; align-items: center; gap: 10px;
   font-size: 14px; color: var(--color-text-secondary);
@@ -271,7 +273,7 @@ defineExpose({ openAdd })
   border-radius: var(--border-radius-md);
   background: var(--color-background-primary);
   color: var(--color-text-primary);
-  padding: 7px 10px; font-size: 14px;
+  height: 34px; padding: 0 10px; font-size: 14px;
 }
 .date-input:focus { outline: none; border-color: var(--color-text-info); }
 
