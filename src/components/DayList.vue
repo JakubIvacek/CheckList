@@ -42,18 +42,25 @@
             ></textarea>
             <CategoryPicker v-model="editCat" />
             <div class="edit-bottom">
-              <button v-if="!confirmDelete" class="delete-btn" @click="confirmDelete = true">
-                <i class="ti ti-trash"></i> {{ t('day.deleteItem') }}
-              </button>
-              <div v-else class="confirm-row">
-                <span>{{ t('common.confirmDelete') }}</span>
+              <template v-if="confirmDelete">
+                <span class="eb-q">{{ t('common.confirmDelete') }}</span>
                 <button class="confirm-yes" @click="removeTask(task)">{{ t('common.delete') }}</button>
                 <button class="confirm-no" @click="confirmDelete = false">{{ t('common.cancel') }}</button>
-              </div>
-              <label class="edit-date">
-                <span>{{ t('day.moveTo') }}</span>
+              </template>
+              <template v-else-if="moveOpen">
+                <span class="eb-q">{{ t('day.moveTo') }}</span>
                 <input type="date" v-model="editDate" class="date-input">
-              </label>
+                <button class="add-confirm" @click="applyMove(task)"><i class="ti ti-check"></i></button>
+                <button class="add-cancel" @click="moveOpen = false"><i class="ti ti-x"></i></button>
+              </template>
+              <template v-else>
+                <button class="delete-btn" @click="confirmDelete = true">
+                  <i class="ti ti-trash"></i> {{ t('day.deleteItem') }}
+                </button>
+                <button class="move-btn" @click="moveOpen = true">
+                  <i class="ti ti-calendar-event"></i> {{ t('day.moveTo') }}
+                </button>
+              </template>
             </div>
           </div>
 
@@ -141,6 +148,7 @@ const editCat = ref<string | null>(null)
 const editDate = ref('')
 const editNote = ref('')
 const confirmDelete = ref(false)
+const moveOpen = ref(false)
 const editEl = ref<HTMLInputElement[] | HTMLInputElement | null>(null)
 
 const catColor = (id: string | null) => categoriesStore.color(id)
@@ -152,6 +160,7 @@ async function openEdit(task: Task) {
   editDate.value = task.task_date
   editNote.value = task.note ?? ''
   confirmDelete.value = false
+  moveOpen.value = false
   await nextTick()
   const el = Array.isArray(editEl.value) ? editEl.value[0] : editEl.value
   el?.focus()
@@ -160,10 +169,19 @@ async function openEdit(task: Task) {
 async function saveEdit(task: Task) {
   const title = editTitle.value.trim()
   if (!title) return
-  const updates: Partial<Task> = { title, category_id: editCat.value, note: editNote.value.trim() || null }
-  if (editDate.value && editDate.value !== task.task_date) updates.task_date = editDate.value
-  await tasksStore.updateTask(task.id, updates)
+  await tasksStore.updateTask(task.id, {
+    title, category_id: editCat.value, note: editNote.value.trim() || null,
+  })
   editingId.value = null
+}
+
+async function applyMove(task: Task) {
+  if (editDate.value && editDate.value !== task.task_date) {
+    await tasksStore.updateTask(task.id, { task_date: editDate.value })
+    editingId.value = null // task moved to another day, leaves this list
+  } else {
+    moveOpen.value = false
+  }
 }
 
 function onReorder(ordered: Task[]) {
@@ -290,12 +308,16 @@ defineExpose({ openAdd })
 .drag-handle:active { cursor: grabbing; }
 .drag-ghost { opacity: 0.4; }
 
-.edit-bottom { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; padding: 0 5px; }
-.edit-date {
-  display: flex; align-items: center; gap: 10px;
-  margin-left: auto;
-  font-size: 14px; color: var(--color-text-secondary);
+.edit-bottom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 0 5px; }
+.eb-q { font-size: 14px; color: var(--color-text-secondary); }
+.move-btn {
+  display: flex; align-items: center; gap: 6px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-primary); cursor: pointer;
+  color: var(--color-text-secondary); font-size: 14px;
+  height: 34px; padding: 0 12px; border-radius: var(--border-radius-md);
 }
+.move-btn i { font-size: 16px; }
 .date-input {
   border: 0.5px solid var(--color-border-secondary);
   border-radius: var(--border-radius-md);

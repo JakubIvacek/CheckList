@@ -15,6 +15,7 @@
   --border-radius-md:8px;
   --border-radius-lg:12px;
   --logo-filter:none;
+  color-scheme:light;
 }
 /* dark palette, shared by system-dark (no manual override) and manual dark */
 @media (prefers-color-scheme: dark){
@@ -32,6 +33,7 @@
     --color-border-tertiary:rgba(235,235,245,0.14);
     --color-border-secondary:rgba(235,235,245,0.24);
     --logo-filter:invert(1) hue-rotate(180deg);
+    color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
@@ -48,6 +50,7 @@
   --color-border-tertiary:rgba(235,235,245,0.14);
   --color-border-secondary:rgba(235,235,245,0.24);
   --logo-filter:invert(1) hue-rotate(180deg);
+  color-scheme:dark;
 }
 
 *{box-sizing:border-box;}
