@@ -20,6 +20,7 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 - [ ] **Trend completion % v čase** (M).
 
 ## Kategórie / organizácia
+- [ ] **Color picker pre kategóriu** (S) — vlastná farba (HTML `color` input) popri preset palete.
 - [ ] **Preradenie poradia kategórií** (S).
 - [ ] **Filter podľa viacerých kategórií naraz** (S).
 - [ ] **Archív / pohľad len hotové** (S).

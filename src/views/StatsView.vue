@@ -399,7 +399,12 @@ onMounted(async () => {
 .block-title { font-size: 15px; font-weight: 500; }
 .block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .block-note { font-size: 12px; color: var(--color-text-tertiary); }
-.manage-link { border: none; background: none; color: var(--color-text-info); font-size: 13px; cursor: pointer; padding: 0; }
+.manage-link {
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-primary);
+  color: var(--color-text-info); font-size: 13px; cursor: pointer;
+  padding: 6px 12px; border-radius: var(--border-radius-md);
+}
 .chart-wrap { height: 120px; margin: 14px 0 10px; }
 .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
@@ -413,15 +418,15 @@ onMounted(async () => {
 .heat-wrap { display: flex; align-items: flex-start; padding: 6px 0 4px; }
 .heat-days { display: flex; flex-direction: column; gap: 3px; margin-right: 6px; flex-shrink: 0; }
 .heat-days span { height: 13px; line-height: 13px; font-size: 9px; color: var(--color-text-tertiary); }
-.heat-days-spacer { height: 15px !important; }
-.heat-scroll { overflow-x: auto; scrollbar-width: none; }
+.heat-days-spacer { height: 18px !important; }
+.heat-scroll { min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .heat-scroll::-webkit-scrollbar { display: none; }
 .heat-months { display: flex; height: 15px; }
 .heat-month { width: 16px; flex-shrink: 0; font-size: 10px; line-height: 1; color: var(--color-text-tertiary); white-space: nowrap; }
 .heat-grid { display: flex; gap: 3px; }
 .heat-col { display: flex; flex-direction: column; gap: 3px; }
 .heat-cell { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
-.heat-legend { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 11px; color: var(--color-text-tertiary); }
+.heat-legend { display: flex; align-items: center; gap: 4px; margin-top: 10px; padding-left: 15px; font-size: 11px; color: var(--color-text-tertiary); }
 .heat-legend .heat-cell { width: 11px; height: 11px; }
 
 .cat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
