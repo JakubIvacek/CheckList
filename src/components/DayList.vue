@@ -10,48 +10,64 @@
       <span class="day-count" :class="{ done: allDone }">{{ doneCount }} / {{ tasks.length }}</span>
     </div>
 
-    <template v-for="task in tasks" :key="task.id">
-      <!-- edit mode -->
-      <div v-if="editingId === task.id" class="add-form">
-        <div class="add-input-row">
-          <input
-            ref="editEl"
-            v-model="editTitle"
-            class="add-input"
-            :placeholder="t('day.itemName')"
-            @keyup.enter="saveEdit(task)"
-            @keyup.esc="cancelEdit"
-          >
-          <button class="add-confirm" @click="saveEdit(task)"><i class="ti ti-check"></i></button>
-          <button class="add-cancel" @click="cancelEdit"><i class="ti ti-x"></i></button>
-        </div>
-        <CategoryPicker v-model="editCat" />
-        <button class="delete-btn" @click="removeTask(task)">
-          <i class="ti ti-trash"></i> {{ t('day.deleteItem') }}
-        </button>
-      </div>
+    <draggable
+      :model-value="tasks"
+      item-key="id"
+      handle=".drag-handle"
+      :animation="150"
+      ghost-class="drag-ghost"
+      @update:model-value="onReorder"
+    >
+      <template #item="{ element: task }">
+        <div class="day-item">
+          <!-- edit mode -->
+          <div v-if="editingId === task.id" class="add-form">
+            <div class="add-input-row">
+              <input
+                ref="editEl"
+                v-model="editTitle"
+                class="add-input"
+                :placeholder="t('day.itemName')"
+                @keyup.enter="saveEdit(task)"
+                @keyup.esc="cancelEdit"
+              >
+              <button class="add-confirm" @click="saveEdit(task)"><i class="ti ti-check"></i></button>
+              <button class="add-cancel" @click="cancelEdit"><i class="ti ti-x"></i></button>
+            </div>
+            <CategoryPicker v-model="editCat" />
+            <label class="edit-date">
+              <span>{{ t('day.moveTo') }}</span>
+              <input type="date" v-model="editDate" class="date-input">
+            </label>
+            <button class="delete-btn" @click="removeTask(task)">
+              <i class="ti ti-trash"></i> {{ t('day.deleteItem') }}
+            </button>
+          </div>
 
-      <!-- normal row -->
-      <div v-else class="trow">
-        <button
-          type="button"
-          class="check"
-          :class="{ checked: task.status === 'done' }"
-          @click="tasksStore.toggleTask(task)"
-          :aria-label="task.status === 'done' ? t('day.markUndone') : t('day.markDone')"
-        >
-          <i v-if="task.status === 'done'" class="ti ti-check"></i>
-        </button>
-        <button type="button" class="row-text-btn" @click="openEdit(task)">
-          <span class="row-text" :class="{ done: task.status === 'done' }">{{ task.title }}</span>
-        </button>
-        <span
-          v-if="catColor(task.category_id)"
-          class="cat-dot"
-          :style="{ background: catColor(task.category_id)! }"
-        ></span>
-      </div>
-    </template>
+          <!-- normal row -->
+          <div v-else class="trow">
+            <button
+              type="button"
+              class="check"
+              :class="{ checked: task.status === 'done' }"
+              @click="tasksStore.toggleTask(task)"
+              :aria-label="task.status === 'done' ? t('day.markUndone') : t('day.markDone')"
+            >
+              <i v-if="task.status === 'done'" class="ti ti-check"></i>
+            </button>
+            <button type="button" class="row-text-btn" @click="openEdit(task)">
+              <span class="row-text" :class="{ done: task.status === 'done' }">{{ task.title }}</span>
+            </button>
+            <span
+              v-if="catColor(task.category_id)"
+              class="cat-dot"
+              :style="{ background: catColor(task.category_id)! }"
+            ></span>
+            <span class="drag-handle" :aria-label="t('day.reorder')"><i class="ti ti-grip-vertical"></i></span>
+          </div>
+        </div>
+      </template>
+    </draggable>
 
     <template v-if="canAdd">
       <div v-if="adding" class="add-form">
@@ -80,6 +96,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import draggable from 'vuedraggable'
 import { useTasksStore } from '@/stores/tasks'
 import { useCategoriesStore } from '@/stores/categories'
 import CategoryPicker from '@/components/CategoryPicker.vue'
@@ -107,6 +124,7 @@ const inputEl = ref<HTMLInputElement | null>(null)
 const editingId = ref<string | null>(null)
 const editTitle = ref('')
 const editCat = ref<string | null>(null)
+const editDate = ref('')
 const editEl = ref<HTMLInputElement[] | HTMLInputElement | null>(null)
 
 const catColor = (id: string | null) => categoriesStore.color(id)
@@ -115,6 +133,7 @@ async function openEdit(task: Task) {
   editingId.value = task.id
   editTitle.value = task.title
   editCat.value = task.category_id
+  editDate.value = task.task_date
   await nextTick()
   const el = Array.isArray(editEl.value) ? editEl.value[0] : editEl.value
   el?.focus()
@@ -123,8 +142,14 @@ async function openEdit(task: Task) {
 async function saveEdit(task: Task) {
   const title = editTitle.value.trim()
   if (!title) return
-  await tasksStore.updateTask(task.id, { title, category_id: editCat.value })
+  const updates: Partial<Task> = { title, category_id: editCat.value }
+  if (editDate.value && editDate.value !== task.task_date) updates.task_date = editDate.value
+  await tasksStore.updateTask(task.id, updates)
   editingId.value = null
+}
+
+function onReorder(ordered: Task[]) {
+  tasksStore.reorderTasks(props.date, ordered.map(x => x.id))
 }
 
 function cancelEdit() {
@@ -225,6 +250,27 @@ defineExpose({ openAdd })
 .delete-btn i { font-size: 16px; }
 
 .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.drag-handle {
+  display: flex; align-items: center; flex-shrink: 0;
+  color: var(--color-text-tertiary); font-size: 18px;
+  cursor: grab; padding: 0 2px; touch-action: none;
+}
+.drag-handle:active { cursor: grabbing; }
+.drag-ghost { opacity: 0.4; }
+
+.edit-date {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  font-size: 14px; color: var(--color-text-secondary);
+}
+.date-input {
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 7px 10px; font-size: 14px;
+}
+.date-input:focus { outline: none; border-color: var(--color-text-info); }
 
 .add-form { display: flex; flex-direction: column; gap: 8px; padding: 6px 0; }
 .add-input-row { display: flex; align-items: center; gap: 8px; }

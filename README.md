@@ -33,6 +33,7 @@ create table tasks (
   status       text not null default 'todo' check (status in ('todo','done')),
   category_id  uuid references categories (id) on delete set null,
   note         text,
+  position     int not null default 0,
   created_at   timestamptz not null default now(),
   completed_at timestamptz
 );
@@ -47,6 +48,21 @@ create policy "tasks owner only" on tasks
 
 create policy "categories owner only" on categories
   for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+
+### Migrácia pre existujúcu DB (drag & drop poradie)
+
+Ak už máš `tasks` bez stĺpca `position`, spusti:
+
+```sql
+alter table tasks add column if not exists position int not null default 0;
+
+-- backfill poradia podľa created_at v rámci dňa
+with ordered as (
+  select id, row_number() over (partition by user_id, task_date order by created_at) - 1 as rn
+  from tasks
+)
+update tasks t set position = o.rn from ordered o where o.id = t.id;
 ```
 
 ## Inštalácia a spustenie

@@ -156,7 +156,9 @@ function registerMonth(key: string, el: unknown) {
 }
 
 const sheetTasks = computed(() =>
-  sheetDate.value ? tasksStore.tasks.filter(t => t.task_date === sheetDate.value) : [])
+  sheetDate.value
+    ? tasksStore.tasks.filter(t => t.task_date === sheetDate.value).sort((a, b) => a.position - b.position)
+    : [])
 const sheetTitle = computed(() => (sheetDate.value ? fmt.fullDate(sheetDate.value) : ''))
 
 function openDay(date: string) { sheetDate.value = date }

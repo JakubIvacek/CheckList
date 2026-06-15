@@ -14,6 +14,7 @@ export interface Task {
   status: TaskStatus
   category_id: string | null
   note: string | null
+  position: number             // order within a day
   created_at: string
   completed_at: string | null
 }

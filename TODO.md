@@ -3,10 +3,7 @@
 Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 
 ## Funkcie
-- [ ] **Prehadzovanie poradia taskov** (drag & drop v rámci dňa).
-  - Vyžaduje nový stĺpec `position int` v tabuľke `tasks` (Supabase) + radenie podľa neho.
 - [ ] **Poznámka k úlohe** — pole `note` v DB už existuje, len doplniť do UI (úprava úlohy).
-- [ ] **Presun úlohy na iný deň** (zmena dátumu pri úprave).
 - [ ] **Opakujúce sa úlohy** (denne / týždenne).
 - [ ] **Vyhľadávanie úloh.**
 
@@ -24,6 +21,7 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 - [ ] Zvážiť vypnutie „Confirm email" alebo nastaviť vlastné SMTP.
 
 ## Hotovo
+- [x] Prehadzovanie poradia taskov (drag & drop v rámci dňa, `position` stĺpec) + presun úlohy na iný deň (dátum v úprave).
 - [x] Účet / Nastavenia stránka — email, jazyk, téma (Systém/Svetlý/Tmavý), správa kategórií, zmena hesla, odhlásenie; ikona nastavení v hlavičke.
 - [x] Manuálny prepínač svetlý / tmavý režim (`data-theme` + localStorage, default systém).
 - [x] Viacjazyčnosť (i18n) — `vue-i18n`, prepínač EN/SK, predvolene Angličtina, lokalizované dátumy, voľba uložená v localStorage.

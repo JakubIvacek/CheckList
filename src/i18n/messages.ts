@@ -20,6 +20,8 @@ export const messages = {
       deleteItem: 'Delete item',
       markDone: 'Mark as done',
       markUndone: 'Mark as not done',
+      moveTo: 'Move to',
+      reorder: 'Reorder',
     },
     cat: {
       none: 'None',
@@ -128,6 +130,8 @@ export const messages = {
       deleteItem: 'Vymazať položku',
       markDone: 'Označiť ako splnené',
       markUndone: 'Označiť ako nesplnené',
+      moveTo: 'Presunúť na',
+      reorder: 'Presunúť',
     },
     cat: {
       none: 'Žiadna',

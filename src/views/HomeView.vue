@@ -142,7 +142,9 @@ const weekDays = computed(() => {
   const t = today()
   return Array.from({ length: 7 }, (_, i) => {
     const date = addDays(monday.value, i)
-    const tasks = filteredTasks.value.filter(task => task.task_date === date)
+    const tasks = filteredTasks.value
+      .filter(task => task.task_date === date)
+      .sort((a, b) => a.position - b.position)
     const isToday = date === t
     const isFuture = date > t
     const full = tasks.length > 0 || isToday || expanded.value.has(date)

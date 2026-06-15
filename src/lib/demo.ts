@@ -59,6 +59,7 @@ function tasksForDate(dateStr: string, todayStr: string): Task[] {
       status,
       category_id,
       note: null,
+      position: i,
       created_at: dateStr + 'T08:00:00.000Z',
       completed_at: status === 'done' ? dateStr + 'T18:00:00.000Z' : null,
     })
