@@ -1,7 +1,6 @@
 <template>
   <div class="stats">
     <div class="top">
-      <div class="title">{{ t('stats.title') }}</div>
       <div class="seg">
         <button v-for="p in periods" :key="p" :class="{ on: period === p }" @click="period = p">
           {{ t('stats.' + p) }}
@@ -378,7 +377,7 @@ onMounted(async () => {
 
 <style scoped>
 .stats { padding-bottom: 16px; }
-.top { padding: 8px 18px 12px; }
+.top { padding: 12px 18px 12px; }
 .title { font-size: 24px; font-weight: 500; margin-bottom: 12px; }
 .seg { display: flex; background: var(--color-background-tertiary); border-radius: 10px; padding: 3px; }
 .seg button {
