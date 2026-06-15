@@ -9,11 +9,12 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 
 ## Pred ostrým nasadením
 - [ ] **PWA ikony (PNG)** — appka je už inštalovateľná cez `stride_icon.svg`, ale doplniť aj `pwa-192.png` / `pwa-512.png` (+ maskable) pre platformy, čo nemajú radi SVG.
-- [ ] **Supabase URL Configuration** — Site URL + Redirect URLs (aj produkčná doména) pre reset hesla a OAuth.
-- [ ] Google OAuth — zapnúť provider v Supabase + nastaviť credentials (ak chceme Google login naživo).
 - [ ] Zvážiť vypnutie „Confirm email" alebo nastaviť vlastné SMTP.
+- [ ] Pri nasadení na produkčnú doménu pridať jej URL do Supabase Site/Redirect URLs.
 
 ## Hotovo
+- [x] Google OAuth — funguje (provider + credentials nastavené v Supabase).
+- [x] Supabase URL Configuration — Site URL + Redirect URLs nastavené (reset hesla aj OAuth funguje).
 - [x] Potvrdenie pred zmazaním (kategórie aj úlohy) + add form sa po pridaní zatvorí.
 - [x] Prázdne stavy — filter kategórie bez úloh (Domov), žiadne dáta v grafe (Štatistiky), prázdne kategórie.
 - [x] Kalendár — „Dnes" v ročnom zobrazení skočí na aktuálny mesiac.
