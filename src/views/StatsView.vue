@@ -47,15 +47,26 @@
     <!-- activity heatmap -->
     <section class="block bordered">
       <div class="block-title">{{ t('stats.activity') }}</div>
-      <div ref="heatEl" class="heat">
-        <div v-for="(week, wi) in heatWeeks" :key="wi" class="heat-col">
-          <div
-            v-for="(day, di) in week"
-            :key="di"
-            class="heat-cell"
-            :style="{ background: heatColor(day.level) }"
-            :title="day.future ? '' : `${day.date}: ${day.count}`"
-          ></div>
+      <div class="heat-wrap">
+        <div class="heat-days">
+          <span class="heat-days-spacer"></span>
+          <span v-for="i in 7" :key="i">{{ [1, 3, 5].includes(i) ? dayLabels[i - 1] : '' }}</span>
+        </div>
+        <div ref="heatEl" class="heat-scroll">
+          <div class="heat-months">
+            <span v-for="(w, wi) in heatWeeks" :key="wi" class="heat-month">{{ heatMonthLabel(wi) }}</span>
+          </div>
+          <div class="heat-grid">
+            <div v-for="(week, wi) in heatWeeks" :key="wi" class="heat-col">
+              <div
+                v-for="(day, di) in week"
+                :key="di"
+                class="heat-cell"
+                :style="{ background: heatColor(day.level) }"
+                :title="day.future ? '' : `${day.date}: ${day.count}`"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="heat-legend">
@@ -324,6 +335,13 @@ function heatColor(level: number) {
   const pct = [0, 32, 55, 80, 100][level]
   return `color-mix(in srgb, var(--color-text-success) ${pct}%, var(--color-background-tertiary))`
 }
+const dayLabels = computed(() => fmt.weekdayShort())
+// month short label above a week column when the month changes from the previous week
+function heatMonthLabel(wi: number): string {
+  const m = parseYmd(heatWeeks.value[wi][0].date).getMonth()
+  const prev = wi > 0 ? parseYmd(heatWeeks.value[wi - 1][0].date).getMonth() : -1
+  return m !== prev ? fmt.monthShort(m) : ''
+}
 
 // done tasks per category within the selected period (incl. "Bez kategórie"), sorted desc
 const NO_CAT = '__none__'
@@ -392,8 +410,15 @@ onMounted(async () => {
 .insight { font-size: 12px; color: var(--color-text-tertiary); }
 .insight span { color: var(--color-text-secondary); }
 
-.heat { display: flex; gap: 3px; overflow-x: auto; padding: 6px 0 4px; scrollbar-width: none; }
-.heat::-webkit-scrollbar { display: none; }
+.heat-wrap { display: flex; align-items: flex-start; padding: 6px 0 4px; }
+.heat-days { display: flex; flex-direction: column; gap: 3px; margin-right: 6px; flex-shrink: 0; }
+.heat-days span { height: 13px; line-height: 13px; font-size: 9px; color: var(--color-text-tertiary); }
+.heat-days-spacer { height: 15px !important; }
+.heat-scroll { overflow-x: auto; scrollbar-width: none; }
+.heat-scroll::-webkit-scrollbar { display: none; }
+.heat-months { display: flex; height: 15px; }
+.heat-month { width: 16px; flex-shrink: 0; font-size: 10px; line-height: 1; color: var(--color-text-tertiary); white-space: nowrap; }
+.heat-grid { display: flex; gap: 3px; }
 .heat-col { display: flex; flex-direction: column; gap: 3px; }
 .heat-cell { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
 .heat-legend { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 11px; color: var(--color-text-tertiary); }
