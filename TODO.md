@@ -7,9 +7,6 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 - [ ] **Opakujúce sa úlohy** (denne / týždenne).
 - [ ] **Vyhľadávanie úloh.**
 
-## Bugy / opravy
-- [ ] **Kalendár — „Dnes" v ročnom zobrazení** neskočí na aktuálny rok/mesiac. Opraviť, nech `goToday` v `year` režime odscrolluje na aktuálny rok (a ideálne zvýrazní/otvorí aktuálny mesiac), rovnako ako to funguje v mesačnom zobrazení.
-
 ## Polish
 - [ ] **Potvrdenie pred zmazaním kategórie** (teraz maže okamžite).
 - [ ] **Prázdne stavy** — jemné hlášky, keď nie sú žiadne úlohy / kategórie / dáta v štatistikách.
@@ -21,6 +18,7 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 - [ ] Zvážiť vypnutie „Confirm email" alebo nastaviť vlastné SMTP.
 
 ## Hotovo
+- [x] Kalendár — „Dnes" v ročnom zobrazení skočí na aktuálny mesiac.
 - [x] Prehadzovanie poradia taskov (drag & drop v rámci dňa, `position` stĺpec) + presun úlohy na iný deň (dátum v úprave).
 - [x] Účet / Nastavenia stránka — email, jazyk, téma (Systém/Svetlý/Tmavý), správa kategórií, zmena hesla, odhlásenie; ikona nastavení v hlavičke.
 - [x] Manuálny prepínač svetlý / tmavý režim (`data-theme` + localStorage, default systém).
