@@ -20,6 +20,10 @@ const TITLES = [
   'Schôdzka s tímom', 'Vyniesť smeti', 'Plánovanie týždňa',
 ]
 
+const NOTES = [
+  'Nezabudnúť detaily', 'Pred obedom', 'Volať vopred', 'Vziať doklady', 'Cca 1 hodina',
+]
+
 // Deterministic hash so the same date always yields the same tasks.
 function hash(s: string): number {
   let h = 2166136261
@@ -58,7 +62,7 @@ function tasksForDate(dateStr: string, todayStr: string): Task[] {
       task_date: dateStr,
       status,
       category_id,
-      note: null,
+      note: hi % 4 === 0 ? NOTES[(hi >>> 5) % NOTES.length] : null,
       position: i,
       created_at: dateStr + 'T08:00:00.000Z',
       completed_at: status === 'done' ? dateStr + 'T18:00:00.000Z' : null,

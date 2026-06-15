@@ -3,7 +3,6 @@
 Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 
 ## Funkcie
-- [ ] **Poznámka k úlohe** — pole `note` v DB už existuje, len doplniť do UI (úprava úlohy).
 - [ ] **Opakujúce sa úlohy** (denne / týždenne).
 - [ ] **Vyhľadávanie úloh.**
 
@@ -13,6 +12,7 @@ Zoznam ďalších vecí na dorobenie. Zhruba zoradené podľa priority.
 - [ ] Pri nasadení na produkčnú doménu pridať jej URL do Supabase Site/Redirect URLs.
 
 ## Hotovo
+- [x] Poznámka k úlohe — textarea v úprave, poznámka sa zobrazuje pod názvom (skrátene).
 - [x] Google OAuth — funguje (provider + credentials nastavené v Supabase).
 - [x] Supabase URL Configuration — Site URL + Redirect URLs nastavené (reset hesla aj OAuth funguje).
 - [x] Potvrdenie pred zmazaním (kategórie aj úlohy) + add form sa po pridaní zatvorí.

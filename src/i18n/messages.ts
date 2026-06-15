@@ -27,6 +27,7 @@ export const messages = {
       markUndone: 'Mark as not done',
       moveTo: 'Move to',
       reorder: 'Reorder',
+      note: 'Note (optional)',
     },
     cat: {
       none: 'None',
@@ -142,6 +143,7 @@ export const messages = {
       markUndone: 'Označiť ako nesplnené',
       moveTo: 'Presunúť na',
       reorder: 'Presunúť',
+      note: 'Poznámka (voliteľné)',
     },
     cat: {
       none: 'Žiadna',

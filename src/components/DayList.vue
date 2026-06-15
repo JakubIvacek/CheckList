@@ -34,6 +34,12 @@
               <button class="add-confirm" @click="saveEdit(task)"><i class="ti ti-check"></i></button>
               <button class="add-cancel" @click="cancelEdit"><i class="ti ti-x"></i></button>
             </div>
+            <textarea
+              v-model="editNote"
+              class="note-input"
+              rows="2"
+              :placeholder="t('day.note')"
+            ></textarea>
             <CategoryPicker v-model="editCat" />
             <div class="edit-bottom">
               <button v-if="!confirmDelete" class="delete-btn" @click="confirmDelete = true">
@@ -64,6 +70,7 @@
             </button>
             <button type="button" class="row-text-btn" @click="openEdit(task)">
               <span class="row-text" :class="{ done: task.status === 'done' }">{{ task.title }}</span>
+              <span v-if="task.note" class="row-note">{{ task.note }}</span>
             </button>
             <span
               v-if="catColor(task.category_id)"
@@ -132,6 +139,7 @@ const editingId = ref<string | null>(null)
 const editTitle = ref('')
 const editCat = ref<string | null>(null)
 const editDate = ref('')
+const editNote = ref('')
 const confirmDelete = ref(false)
 const editEl = ref<HTMLInputElement[] | HTMLInputElement | null>(null)
 
@@ -142,6 +150,7 @@ async function openEdit(task: Task) {
   editTitle.value = task.title
   editCat.value = task.category_id
   editDate.value = task.task_date
+  editNote.value = task.note ?? ''
   confirmDelete.value = false
   await nextTick()
   const el = Array.isArray(editEl.value) ? editEl.value[0] : editEl.value
@@ -151,7 +160,7 @@ async function openEdit(task: Task) {
 async function saveEdit(task: Task) {
   const title = editTitle.value.trim()
   if (!title) return
-  const updates: Partial<Task> = { title, category_id: editCat.value }
+  const updates: Partial<Task> = { title, category_id: editCat.value, note: editNote.value.trim() || null }
   if (editDate.value && editDate.value !== task.task_date) updates.task_date = editDate.value
   await tasksStore.updateTask(task.id, updates)
   editingId.value = null
@@ -244,7 +253,11 @@ defineExpose({ openAdd })
 }
 .check.dashed i { font-size: 13px; }
 
-.row-text-btn { flex: 1; border: none; background: none; text-align: left; padding: 0; cursor: text; }
+.row-text-btn { flex: 1; min-width: 0; border: none; background: none; text-align: left; padding: 0; cursor: text; display: flex; flex-direction: column; gap: 2px; }
+.row-note {
+  font-size: 12px; color: var(--color-text-tertiary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
 .row-text { font-size: 15px; color: var(--color-text-primary); }
 .row-text.done { color: var(--color-text-tertiary); text-decoration: line-through; }
 .row-text.muted { font-size: 14px; color: var(--color-text-tertiary); }
@@ -310,6 +323,14 @@ defineExpose({ openAdd })
   font-size: 15px;
 }
 .add-input:focus { outline: none; border-color: var(--color-text-info); }
+.note-input {
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  padding: 8px 10px; font-size: 14px; font-family: inherit; resize: vertical;
+}
+.note-input:focus { outline: none; border-color: var(--color-text-info); }
 .add-confirm, .add-cancel {
   width: 34px; height: 34px; border-radius: var(--border-radius-md);
   border: none; cursor: pointer; flex-shrink: 0;
