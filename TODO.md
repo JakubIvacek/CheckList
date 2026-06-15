@@ -16,7 +16,6 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 - [ ] **Animácie / haptika** (S) — jemné prechody, vibrácia pri akcii.
 
 ## Štatistiky
-- [ ] **Heatmapa v kalendári** (M) — GitHub-style prehľad aktivity.
 - [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres.
 - [ ] **Trend completion % v čase** (M).
 
@@ -42,6 +41,7 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 ---
 
 ## Hotovo
+- [x] Štatistiky — heatmapa aktivity (GitHub-style) + insight podľa obdobia (najsilnejší deň/týždeň/mesiac).
 - [x] Poznámka k úlohe — textarea v úprave, zobrazená pod názvom.
 - [x] Prehadzovanie poradia (drag & drop, `position`) + presun úlohy na iný deň.
 - [x] Potvrdenie pred zmazaním (kategórie aj úlohy) + add form sa po pridaní zatvorí.

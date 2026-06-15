@@ -36,11 +36,36 @@
         <div class="chart-wrap">
           <Bar :data="chartData" :options="chartOptions" />
         </div>
-        <div class="insight">{{ t('stats.strongestDay', { day: strongestDay }) }}</div>
+        <div v-if="insight" class="insight">{{ insight }}</div>
       </template>
       <div v-else class="empty-state">
         <i class="ti ti-chart-bar-off"></i>
         <span>{{ t('empty.noStats') }}</span>
+      </div>
+    </section>
+
+    <!-- activity heatmap -->
+    <section class="block bordered">
+      <div class="block-title">{{ t('stats.activity') }}</div>
+      <div ref="heatEl" class="heat">
+        <div v-for="(week, wi) in heatWeeks" :key="wi" class="heat-col">
+          <div
+            v-for="(day, di) in week"
+            :key="di"
+            class="heat-cell"
+            :style="{ background: heatColor(day.level) }"
+            :title="day.future ? '' : `${day.date}: ${day.count}`"
+          ></div>
+        </div>
+      </div>
+      <div class="heat-legend">
+        <span>{{ t('stats.less') }}</span>
+        <span class="heat-cell" :style="{ background: heatColor(0) }"></span>
+        <span class="heat-cell" :style="{ background: heatColor(1) }"></span>
+        <span class="heat-cell" :style="{ background: heatColor(2) }"></span>
+        <span class="heat-cell" :style="{ background: heatColor(3) }"></span>
+        <span class="heat-cell" :style="{ background: heatColor(4) }"></span>
+        <span>{{ t('stats.more') }}</span>
       </div>
     </section>
 
@@ -65,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { Bar } from 'vue-chartjs'
 import {
   Chart, BarElement, CategoryScale, LinearScale, Tooltip,
@@ -236,15 +261,69 @@ const chartOptions = computed(() => {
   }
 })
 
-const strongestDay = computed(() => {
-  const counts = new Array(7).fill(0)
-  for (const task of tasksStore.tasks) {
-    if (task.status === 'done') counts[weekdayIndex(task.task_date)]++
+const doneTasks = computed(() => tasksStore.tasks.filter(t => t.status === 'done'))
+
+// insight adapts to the period: week → strongest weekday, month → strongest
+// week, year → strongest month
+const insight = computed(() => {
+  const tasks = doneTasks.value
+  if (!tasks.length) return null
+
+  if (period.value === 'week') {
+    const counts = new Array(7).fill(0)
+    for (const t of tasks) counts[weekdayIndex(t.task_date)]++
+    const max = Math.max(...counts)
+    if (!max) return null
+    return t('stats.strongestDay', { day: fmt.dayName(addDays(getMonday(todayStr), counts.indexOf(max))) })
   }
+
+  if (period.value === 'month') {
+    const counts = new Map<string, number>()
+    for (const task of tasks) {
+      const mon = getMonday(task.task_date)
+      counts.set(mon, (counts.get(mon) ?? 0) + 1)
+    }
+    let best = '', bestN = 0
+    for (const [mon, n] of counts) if (n > bestN) { bestN = n; best = mon }
+    if (!best) return null
+    const md = parseYmd(best)
+    return t('stats.strongestWeek', { week: `${md.getDate()}.${md.getMonth() + 1}` })
+  }
+
+  // year
+  const counts = new Array(12).fill(0)
+  for (const task of tasks) counts[parseYmd(task.task_date).getMonth()]++
   const max = Math.max(...counts)
-  if (max === 0) return '—'
-  return fmt.dayName(addDays(getMonday(todayStr), counts.indexOf(max)))
+  if (!max) return null
+  return t('stats.strongestMonth', { month: fmt.monthName(counts.indexOf(max)) })
 })
+
+// GitHub-style activity heatmap (last ~26 weeks, columns = weeks, rows = Mon–Sun)
+const HEAT_WEEKS = 26
+const heatEl = ref<HTMLElement | null>(null)
+const heatWeeks = computed(() => {
+  const counts = new Map<string, number>()
+  for (const t of doneTasks.value) counts.set(t.task_date, (counts.get(t.task_date) ?? 0) + 1)
+  const startMon = addDays(getMonday(todayStr), -7 * (HEAT_WEEKS - 1))
+  const weeks: { date: string; count: number; future: boolean; level: number }[][] = []
+  for (let w = 0; w < HEAT_WEEKS; w++) {
+    const days = []
+    for (let d = 0; d < 7; d++) {
+      const date = addDays(startMon, w * 7 + d)
+      const future = date > todayStr
+      const count = counts.get(date) ?? 0
+      days.push({ date, count, future, level: future ? -1 : Math.min(4, count) })
+    }
+    weeks.push(days)
+  }
+  return weeks
+})
+function heatColor(level: number) {
+  if (level < 0) return 'transparent'
+  if (level === 0) return 'var(--color-background-tertiary)'
+  const pct = [0, 32, 55, 80, 100][level]
+  return `color-mix(in srgb, var(--color-text-success) ${pct}%, var(--color-background-tertiary))`
+}
 
 // done tasks per category within the selected period (incl. "Bez kategórie"), sorted desc
 const NO_CAT = '__none__'
@@ -273,6 +352,9 @@ onMounted(async () => {
   const d = parseYmd(todayStr)
   // fetch a year of history (covers all periods, 6-week chart, and streaks)
   await tasksStore.fetchRange(ymd(new Date(d.getFullYear() - 1, d.getMonth(), 1)), todayStr)
+  // show the most recent weeks first
+  await nextTick()
+  if (heatEl.value) heatEl.value.scrollLeft = heatEl.value.scrollWidth
 })
 </script>
 
@@ -309,6 +391,13 @@ onMounted(async () => {
 .empty-state i { font-size: 28px; }
 .insight { font-size: 12px; color: var(--color-text-tertiary); }
 .insight span { color: var(--color-text-secondary); }
+
+.heat { display: flex; gap: 3px; overflow-x: auto; padding: 6px 0 4px; scrollbar-width: none; }
+.heat::-webkit-scrollbar { display: none; }
+.heat-col { display: flex; flex-direction: column; gap: 3px; }
+.heat-cell { width: 13px; height: 13px; border-radius: 3px; flex-shrink: 0; }
+.heat-legend { display: flex; align-items: center; gap: 4px; margin-top: 10px; font-size: 11px; color: var(--color-text-tertiary); }
+.heat-legend .heat-cell { width: 11px; height: 11px; }
 
 .cat-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .cat-row:last-child { margin-bottom: 0; }
