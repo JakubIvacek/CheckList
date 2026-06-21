@@ -8,7 +8,7 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 - [ ] **Opakujúce sa úlohy** (M–L) — denne / týždenne; každý výskyt = samostatný task. Treba stĺpec `repeat` + generovanie výskytov + „zmazať tento / celú sériu".
 
 ## Gestá / UX
-- [ ] **Animácie / haptika** (S) — jemné prechody, vibrácia pri akcii.
+- [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
 
 ## Štatistiky
 - [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres.
@@ -34,6 +34,7 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 ---
 
 ## Hotovo
+- [x] Animácie — checkbox pop + plynulé vyfarbenie, animované prečiarknutie textu, press efekt na tlačidlách, vsunutie „Späť" riadku; pod `prefers-reduced-motion`.
 - [x] Trend completion % v čase — prepínač Počet ↔ % v hlavičke grafu (rovnaké obdobia), hodnoty nad stĺpcami.
 - [x] Priorita / vlajka — klikateľná vlajka v riadku (sivá = bežná, červená = dôležitá), prepína sa priamo; `priority` bool stĺpec.
 - [x] PWA PNG ikony — pwa-192/512 + maskable-512 v `public/`, zapojené do manifestu (`vite.config.ts`) + apple-touch-icon v `index.html`.

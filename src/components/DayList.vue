@@ -471,9 +471,11 @@ defineExpose({ openAdd })
   display: flex; align-items: center; justify-content: center;
   padding: 0; cursor: pointer;
   color: #fff;
+  transition: background-color .2s ease, border-color .2s ease, transform .1s ease;
 }
+.check:active { transform: scale(0.88); }
 .check.checked { background: var(--color-text-success); border-color: var(--color-text-success); }
-.check.checked i { font-size: 14px; }
+.check.checked i { font-size: 14px; animation: check-pop .25s ease; }
 .check.dashed {
   border-style: dashed;
   border-color: var(--color-border-tertiary);
@@ -491,8 +493,18 @@ defineExpose({ openAdd })
   color: var(--color-text-secondary); min-width: 38px;
 }
 .row-time.done { color: var(--color-text-tertiary); text-decoration: line-through; }
-.row-text { font-size: 15px; color: var(--color-text-primary); }
-.row-text.done { color: var(--color-text-tertiary); text-decoration: line-through; }
+.row-text {
+  font-size: 15px; color: var(--color-text-primary);
+  position: relative; align-self: flex-start; max-width: 100%;
+  transition: color .25s ease;
+}
+.row-text::after {
+  content: ''; position: absolute; left: 0; top: 52%;
+  width: 100%; height: 1.5px; background: currentColor; border-radius: 1px;
+  transform: scaleX(0); transform-origin: left; transition: transform .25s ease;
+}
+.row-text.done { color: var(--color-text-tertiary); }
+.row-text.done::after { transform: scaleX(1); }
 .flag-dot {
   border: none; background: none; cursor: pointer; padding: 2px; flex-shrink: 0;
   display: flex; align-items: center; font-size: 16px; color: var(--color-text-tertiary);
@@ -598,4 +610,33 @@ defineExpose({ openAdd })
 }
 .add-confirm { background: var(--color-text-success); color: #fff; }
 .add-cancel { background: var(--color-background-tertiary); color: var(--color-text-secondary); }
+
+/* subtle press feedback on tap */
+.flag-dot, .add-confirm, .add-cancel, .delete-btn, .move-btn, .tomb-undo {
+  transition: transform .1s ease, background-color .15s ease, color .15s ease;
+}
+.flag-dot:active, .add-confirm:active, .add-cancel:active,
+.delete-btn:active, .move-btn:active, .tomb-undo:active { transform: scale(0.92); }
+
+@keyframes check-pop {
+  0% { transform: scale(0.2); opacity: 0; }
+  60% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+.tomb-row { animation: tomb-in .2s ease; }
+@keyframes tomb-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  .check, .check.checked i, .row-text, .row-text::after, .tomb-row,
+  .flag-dot, .add-confirm, .add-cancel, .delete-btn, .move-btn, .tomb-undo {
+    transition: none !important; animation: none !important;
+  }
+  .row-text.done { text-decoration: line-through; }
+  .row-text.done::after { display: none; }
+}
 </style>
