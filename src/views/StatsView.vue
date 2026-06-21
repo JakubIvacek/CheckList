@@ -28,12 +28,18 @@
       </div>
     </div>
 
-    <!-- period bar chart -->
+    <!-- period bar chart (count ↔ completion %) -->
     <section class="block">
-      <div class="block-title">{{ chartTitle }}</div>
+      <div class="block-head">
+        <span class="block-title">{{ chartTitle }}</span>
+        <div class="seg seg-sm">
+          <button :class="{ on: chartMode === 'count' }" @click="chartMode = 'count'">{{ t('stats.count') }}</button>
+          <button :class="{ on: chartMode === 'percent' }" @click="chartMode = 'percent'">%</button>
+        </div>
+      </div>
       <template v-if="hasChartData">
         <div class="chart-wrap">
-          <Bar :data="chartData" :options="chartOptions" />
+          <Bar :data="chartData" :options="chartOptions" :plugins="[valueLabels]" />
         </div>
         <div v-if="insight" class="insight">{{ insight }}</div>
       </template>
@@ -123,6 +129,7 @@ const catSheet = ref(false)
 
 const periods = ['week', 'month', 'year'] as const
 const period = ref<'week' | 'month' | 'year'>('week')
+const chartMode = ref<'count' | 'percent'>('count')
 
 function cssVar(name: string) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim()
@@ -194,24 +201,31 @@ const longestStreak = computed(() => {
 })
 
 // --- chart adapts to the selected period ---
-const chartTitle = computed(() =>
-  period.value === 'week' ? t('stats.byDay')
+const chartTitle = computed(() => {
+  if (chartMode.value === 'percent') return t('stats.completion')
+  return period.value === 'week' ? t('stats.byDay')
     : period.value === 'month' ? t('stats.byWeek')
-      : t('stats.byMonth'))
+      : t('stats.byMonth')
+})
 
 function doneBetween(from: string, to: string) {
   return tasksStore.tasks.filter(t => t.status === 'done' && t.task_date >= from && t.task_date <= to).length
 }
+function totalBetween(from: string, to: string) {
+  return tasksStore.tasks.filter(t => t.task_date >= from && t.task_date <= to).length
+}
 
 const buckets = computed(() => {
-  const list: { label: string; done: number; isCurrent: boolean }[] = []
+  const list: { label: string; done: number; total: number; isCurrent: boolean }[] = []
+  const push = (label: string, from: string, to: string, isCurrent: boolean) =>
+    list.push({ label, done: doneBetween(from, to), total: totalBetween(from, to), isCurrent })
   if (period.value === 'week') {
     // current week, day by day (Po–Ne)
     const mon = getMonday(todayStr)
     const letters = fmt.dayLetters()
     for (let i = 0; i < 7; i++) {
       const d = addDays(mon, i)
-      list.push({ label: letters[i], done: doneBetween(d, d), isCurrent: d === todayStr })
+      push(letters[i], d, d, d === todayStr)
     }
   } else if (period.value === 'month') {
     // last 6 weeks
@@ -219,30 +233,35 @@ const buckets = computed(() => {
     for (let i = 5; i >= 0; i--) {
       const mon = addDays(mondayThis, -7 * i)
       const md = parseYmd(mon)
-      list.push({ label: `${md.getDate()}.${md.getMonth() + 1}`, done: doneBetween(mon, addDays(mon, 6)), isCurrent: i === 0 })
+      push(`${md.getDate()}.${md.getMonth() + 1}`, mon, addDays(mon, 6), i === 0)
     }
   } else {
     // 12 months of the current year
     const d = parseYmd(todayStr)
     const y = d.getFullYear(), curM = d.getMonth()
     for (let m = 0; m < 12; m++) {
-      const from = ymd(new Date(y, m, 1))
-      const to = ymd(new Date(y, m + 1, 0))
-      list.push({ label: fmt.monthShort(m), done: doneBetween(from, to), isCurrent: m === curM })
+      push(fmt.monthShort(m), ymd(new Date(y, m, 1)), ymd(new Date(y, m + 1, 0)), m === curM)
     }
   }
   return list
 })
 
-const hasChartData = computed(() => buckets.value.some(b => b.done > 0))
+// completion % per bucket (0 when the bucket has no tasks)
+const bucketPct = (b: { done: number; total: number }) => (b.total ? Math.round(b.done / b.total * 100) : 0)
+
+const hasChartData = computed(() =>
+  chartMode.value === 'percent'
+    ? buckets.value.some(b => b.total > 0)
+    : buckets.value.some(b => b.done > 0))
 
 const chartData = computed(() => {
   const success = cssVar('--color-text-success') || '#34c759'
   const danger = cssVar('--color-text-danger') || '#ff3b30'
+  const percent = chartMode.value === 'percent'
   return {
     labels: buckets.value.map(b => b.label),
     datasets: [{
-      data: buckets.value.map(b => b.done),
+      data: buckets.value.map(b => percent ? bucketPct(b) : b.done),
       backgroundColor: buckets.value.map(b => b.isCurrent ? danger : success),
       borderRadius: 5,
       borderSkipped: false,
@@ -251,13 +270,45 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = computed(() => {
+// small value labels drawn above each non-zero bar (count or "%")
+const valueLabels = {
+  id: 'valueLabels',
+  afterDatasetsDraw(chart: any) {
+    const ctx = chart.ctx
+    const meta = chart.getDatasetMeta(0)
+    const percent = chartMode.value === 'percent'
+    const color = cssVar('--color-text-tertiary') || '#aeaeb2'
+    chart.data.datasets[0].data.forEach((v: number, i: number) => {
+      if (!v) return
+      const bar = meta.data[i]
+      ctx.save()
+      ctx.fillStyle = color
+      ctx.font = '600 10px -apple-system, system-ui, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'bottom'
+      ctx.fillText(percent ? `${v}%` : `${v}`, bar.x, bar.y - 4)
+      ctx.restore()
+    })
+  },
+}
+
+const chartOptions = computed<any>(() => {
   const tertiary = cssVar('--color-text-tertiary') || '#aeaeb2'
   const danger = cssVar('--color-text-danger') || '#ff3b30'
+  const percent = chartMode.value === 'percent'
   return {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: { legend: { display: false }, tooltip: { enabled: true } },
+    layout: { padding: { top: 16 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        enabled: true,
+        callbacks: percent
+          ? { label: (ctx: { raw: number }) => `${ctx.raw} %` }
+          : {},
+      },
+    },
     scales: {
       x: {
         grid: { display: false, drawBorder: false },
@@ -266,7 +317,7 @@ const chartOptions = computed(() => {
           font: { size: 11 },
         },
       },
-      y: { display: false, beginAtZero: true },
+      y: { display: false, beginAtZero: true, max: percent ? 100 : undefined },
     },
   }
 })
@@ -385,6 +436,8 @@ onMounted(async () => {
   font-size: 13px; color: var(--color-text-secondary); padding: 6px 0; border-radius: 8px;
 }
 .seg button.on { background: var(--color-background-primary); color: var(--color-text-primary); font-weight: 500; }
+.seg-sm { width: auto; padding: 2px; border-radius: 8px; flex-shrink: 0; }
+.seg-sm button { flex: 0 0 auto; font-size: 12px; padding: 4px 11px; }
 
 .metrics { padding: 0 18px 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; }

@@ -12,7 +12,6 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 
 ## Štatistiky
 - [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres.
-- [ ] **Trend completion % v čase** (M).
 
 ## Kategórie / organizácia
 - [ ] **Preradenie poradia kategórií** (S).
@@ -35,6 +34,7 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 ---
 
 ## Hotovo
+- [x] Trend completion % v čase — prepínač Počet ↔ % v hlavičke grafu (rovnaké obdobia), hodnoty nad stĺpcami.
 - [x] Priorita / vlajka — klikateľná vlajka v riadku (sivá = bežná, červená = dôležitá), prepína sa priamo; `priority` bool stĺpec.
 - [x] PWA PNG ikony — pwa-192/512 + maskable-512 v `public/`, zapojené do manifestu (`vite.config.ts`) + apple-touch-icon v `index.html`.
 - [x] Swipe na úlohe (mobil) — → hotovo/nehotovo, ← zmazať (prah 80px, farebný podklad, nekoliduje s prepínaním týždňov).
