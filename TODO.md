@@ -2,34 +2,46 @@
 
 Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = stredné, **L** = veľké. 🔥 = odporúčané (dobrý pomer hodnota/námaha).
 
-## Správa úloh
-- [ ] **Vyhľadávanie úloh** (S) — hľadať podľa názvu/poznámky. 🔥
-- [ ] **Podúlohy / checklist** v úlohe (M).
-- [ ] **Opakujúce sa úlohy** (M–L) — denne / týždenne; každý výskyt = samostatný task. Treba stĺpec `repeat` + generovanie výskytov + „zmazať tento / celú sériu".
+## Roadmap (poradie implementácie)
 
-## Gestá / UX
-- [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
+1. [ ] **Zmazať účet + dáta** (S) — zmazať všetky úlohy/kategórie + účet, s potvrdením.
+2. [ ] **Opakujúce sa úlohy — jednoduché** (M) — pole `repeat` na úlohe: **None / Daily / Weekly / Monthly**. Pri označení úlohy ako **hotovej** sa automaticky vytvorí nový task o interval ďalej (+1 deň / +7 dní / +1 mesiac). DB = **jeden stĺpec `repeat`**, nič viac.
+   - ⛔ ZÁMERNE NEROBIŤ: `series_id`, generovanie výskytov dopredu, „zmazať tento výskyt / celú sériu", „upraviť tento / všetky". To je kalendárová nočná mora — držať sa „spawn next on complete".
+3. [ ] **Overdue úlohy** (M) — sekcia hore na Domove „Overdue (N)" s nedokončenými úlohami spred dneška + akcie (hotovo / posunúť na dnes / zmazať). Treba ťahať nedokončené aj mimo aktuálneho týždňa.
+4. [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres (localStorage, bez DB).
+5. [ ] **Export JSON** (S) — stiahnuť zálohu úloh (a kategórií) do JSON.
+6. [ ] **Filter „len hotové" / archív** (S) — prepínač zobraziť len dokončené.
 
-## Štatistiky
-- [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres.
+Potom (nižšia priorita):
 
-## Kategórie / organizácia
-- [ ] **Preradenie poradia kategórií** (S).
-- [ ] **Filter podľa viacerých kategórií naraz** (S).
-- [ ] **Archív / pohľad len hotové** (S).
+7. [ ] **Preradenie poradia kategórií** (S) — `categories.position` + drag (potrebuje migráciu).
+8. [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
+9. [ ] **Filter podľa viacerých kategórií naraz** (S).
+10. [ ] **Import JSON** (S–M) — obnova zo zálohy.
 
-## Účet / dáta
-- [ ] **Export / import** (S–M) — CSV/JSON záloha úloh.
-- [ ] **Zmazať účet + dáta** (S).
+## Polish (leštenie pred „launchom")
+- [ ] **Jemné animácie** (S) — rozšíriť o plynulý expand úlohy (edit form sa roztvorí, nie skok) + prechod do Settings (fade/slide route transition); jednotných 150–200 ms. (Základ — checkbox pop, prečiarknutie, press, „Späť" riadok — už hotový.)
 
-## PWA / platforma
-- [ ] **Pripomienky / push notifikácie** (L) — „nezabudni na úlohu" (potrebuje riešenie pre push).
-- [ ] **Offline-first** (L) — IndexedDB + sync (CLAUDE.md to vedome odkladá).
+## Veľké / neskôr (L)
+- [ ] **Pripomienky / push notifikácie** — „nezabudni na úlohu" (potrebuje riešenie pre push).
+- [ ] **Offline-first** — IndexedDB + sync (CLAUDE.md to vedome odkladá).
 
-## Pred ostrým nasadením
+## Pred ostrým nasadením (technické)
 - [ ] **Hosting** (Vercel / Cloudflare Pages / Netlify) + SPA rewrite config + env premenné.
 - [ ] Pri nasadení pridať produkčnú doménu do **Supabase → Auth → URL Configuration**.
 - [ ] Zvážiť vypnutie „Confirm email" alebo vlastné SMTP (default email má prísne limity).
+
+## Pred launchom (produkt / právne / marketing)
+- [ ] **Privacy Policy** (S) — nutná, keď zbieraš email + úlohy. Nemusí byť zložitá. *(netreba kód — len text na statickej stránke, route `/privacy` + odkaz v Settings.)*
+- [ ] **Terms of Service** (S) — krátke; aby appka pôsobila ako reálny produkt. *(rovnako: route `/terms` + odkaz v Settings.)*
+- [ ] **Kontaktný email** (S) — napr. `hello@strideapp.xyz` / `support@…`.
+- [ ] **Favicon + social preview / Open Graph** (S) — pri zdieľaní linku sa ukáže logo + názov + popis. Veľa indie appiek na to zabudne. *(lacné, viem spraviť rýchlo.)*
+- [ ] **Analytics** (S) — aspoň niečo: koľko prišlo / zaregistrovalo sa / vrátilo sa. *(Plausible = najjednoduchší, 1 script tag, GDPR-friendly.)*
+- [ ] **Feedback button** (S) — v Settings „Send feedback" → `mailto:`. Lacné a brutálne užitočné. *(pokojne pribaliť k niektorému Settings commitu.)*
+
+## Nice to have (marketing)
+- [ ] **Demo účet** (S) — „Try demo" bez registrácie (demo mód už existuje v dev — sprístupniť aj v prod). Super pre marketing videá.
+- [ ] **Landing page** (M) — jednoduchá: „Stride — simple weekly planner", [Get Started], pár screenshotov. Nie 20 sekcií.
 
 ---
 
