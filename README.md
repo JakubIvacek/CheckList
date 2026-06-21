@@ -51,6 +51,7 @@ create table tasks (
   task_date    date not null,
   task_time    time,
   duration_min int,
+  priority     boolean not null default false,
   status       text not null default 'todo' check (status in ('todo','done')),
   category_id  uuid references categories (id) on delete set null,
   note         text,
@@ -91,6 +92,7 @@ update tasks t set position = o.rn from ordered o where o.id = t.id;
 ```sql
 alter table tasks add column if not exists task_time time;
 alter table tasks add column if not exists duration_min int;
+alter table tasks add column if not exists priority boolean not null default false;
 ```
 
 ## Inštalácia a spustenie

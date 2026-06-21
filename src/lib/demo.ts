@@ -63,12 +63,15 @@ function tasksForDate(dateStr: string, todayStr: string): Task[] {
     const dh = hash(dateStr + ':dur:' + i)
     const DURS = [15, 30, 45, 60, 90, 120]
     const duration_min = dh % 3 === 0 ? DURS[(dh >> 4) % DURS.length] : null
+    // ~1 of every 5 tasks is flagged as important
+    const priority = hash(dateStr + ':pri:' + i) % 5 === 0
     out.push({
       id: `demo-${dateStr}-${i}`,
       title: TITLES[(hi >>> 2) % TITLES.length],
       task_date: dateStr,
       task_time,
       duration_min,
+      priority,
       status,
       category_id,
       note: hi % 4 === 0 ? NOTES[(hi >>> 5) % NOTES.length] : null,

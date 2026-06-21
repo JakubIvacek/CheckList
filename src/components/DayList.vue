@@ -123,6 +123,13 @@
                 class="cat-dot"
                 :style="{ background: catColor(task.category_id)! }"
               ></span>
+              <button
+                type="button"
+                class="flag-dot"
+                :class="{ on: task.priority }"
+                @click.stop="toggleFlag(task)"
+                :aria-label="t('day.priority')"
+              ><i class="ti ti-flag"></i></button>
               <span class="drag-handle" :aria-label="t('day.reorder')"><i class="ti ti-grip-vertical"></i></span>
             </div>
           </div>
@@ -249,6 +256,10 @@ const moveOpen = ref(false)
 const editEl = ref<HTMLInputElement[] | HTMLInputElement | null>(null)
 
 const catColor = (id: string | null) => categoriesStore.color(id)
+
+function toggleFlag(task: Task) {
+  tasksStore.updateTask(task.id, { priority: !task.priority })
+}
 
 async function openEdit(task: Task) {
   editingId.value = task.id
@@ -482,6 +493,11 @@ defineExpose({ openAdd })
 .row-time.done { color: var(--color-text-tertiary); text-decoration: line-through; }
 .row-text { font-size: 15px; color: var(--color-text-primary); }
 .row-text.done { color: var(--color-text-tertiary); text-decoration: line-through; }
+.flag-dot {
+  border: none; background: none; cursor: pointer; padding: 2px; flex-shrink: 0;
+  display: flex; align-items: center; font-size: 16px; color: var(--color-text-tertiary);
+}
+.flag-dot.on { color: var(--color-text-info); }
 .row-text.muted { font-size: 14px; color: var(--color-text-tertiary); }
 .trow-add { background: none; border: none; width: 100%; text-align: left; }
 

@@ -13,6 +13,7 @@ export interface Task {
   task_date: string            // 'YYYY-MM-DD'
   task_time: string | null     // 'HH:MM' (local) or null = no specific time
   duration_min: number | null  // estimated duration in minutes, or null
+  priority: boolean            // flagged as important
   status: TaskStatus
   category_id: string | null
   note: string | null

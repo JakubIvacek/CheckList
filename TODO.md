@@ -4,7 +4,6 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 
 ## Správa úloh
 - [ ] **Vyhľadávanie úloh** (S) — hľadať podľa názvu/poznámky. 🔥
-- [ ] **Priorita / vlajka** (S) — zvýrazniť dôležité úlohy.
 - [ ] **Podúlohy / checklist** v úlohe (M).
 - [ ] **Opakujúce sa úlohy** (M–L) — denne / týždenne; každý výskyt = samostatný task. Treba stĺpec `repeat` + generovanie výskytov + „zmazať tento / celú sériu".
 
@@ -36,6 +35,7 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 ---
 
 ## Hotovo
+- [x] Priorita / vlajka — klikateľná vlajka v riadku (sivá = bežná, červená = dôležitá), prepína sa priamo; `priority` bool stĺpec.
 - [x] PWA PNG ikony — pwa-192/512 + maskable-512 v `public/`, zapojené do manifestu (`vite.config.ts`) + apple-touch-icon v `index.html`.
 - [x] Swipe na úlohe (mobil) — → hotovo/nehotovo, ← zmazať (prah 80px, farebný podklad, nekoliduje s prepínaním týždňov).
 - [x] Undo po zmazaní — inline riadok „Späť" (~5 s) na mieste zmazanej úlohy (swipe aj tlačidlo Delete); vráti úlohu vrátane poradia.

@@ -45,7 +45,7 @@ export const useTasksStore = defineStore('tasks', () => {
     if (isDemo) {
       tasks.value.push({
         id: `demo-${crypto.randomUUID()}`,
-        title, task_date, task_time, duration_min, status: 'todo',
+        title, task_date, task_time, duration_min, priority: false, status: 'todo',
         category_id, note: null, position,
         created_at: new Date().toISOString(), completed_at: null,
       })

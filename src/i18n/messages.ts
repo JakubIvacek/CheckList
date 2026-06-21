@@ -31,6 +31,7 @@ export const messages = {
       note: 'Note (optional)',
       time: 'Time (optional)',
       duration: 'Duration',
+      priority: 'Flag as important',
     },
     cat: {
       none: 'None',
@@ -156,6 +157,7 @@ export const messages = {
       note: 'Poznámka (voliteľné)',
       time: 'Čas (voliteľné)',
       duration: 'Trvanie',
+      priority: 'Označiť ako dôležité',
     },
     cat: {
       none: 'Žiadna',
@@ -265,7 +267,7 @@ export const messages = {
     day: {
       today: 'heute', addItem: 'Aufgabe hinzufügen', itemName: 'Aufgabenname', deleteItem: 'Aufgabe löschen',
       markDone: 'Als erledigt markieren', markUndone: 'Als offen markieren', moveTo: 'Verschieben auf',
-      reorder: 'Sortieren', note: 'Notiz (optional)', time: 'Uhrzeit (optional)', duration: 'Dauer',
+      reorder: 'Sortieren', note: 'Notiz (optional)', time: 'Uhrzeit (optional)', duration: 'Dauer', priority: 'Als wichtig markieren',
     },
     cat: {
       none: 'Keine', new: 'Neu', name: 'Kategoriename', title: 'Kategorien', newCategory: 'Neue Kategorie',
@@ -320,7 +322,7 @@ export const messages = {
     day: {
       today: 'hoy', addItem: 'Añadir tarea', itemName: 'Nombre de la tarea', deleteItem: 'Eliminar tarea',
       markDone: 'Marcar como hecha', markUndone: 'Marcar como pendiente', moveTo: 'Mover a',
-      reorder: 'Reordenar', note: 'Nota (opcional)', time: 'Hora (opcional)', duration: 'Duración',
+      reorder: 'Reordenar', note: 'Nota (opcional)', time: 'Hora (opcional)', duration: 'Duración', priority: 'Marcar como importante',
     },
     cat: {
       none: 'Ninguna', new: 'Nueva', name: 'Nombre de categoría', title: 'Categorías', newCategory: 'Nueva categoría',
@@ -375,7 +377,7 @@ export const messages = {
     day: {
       today: 'aujourd’hui', addItem: 'Ajouter une tâche', itemName: 'Nom de la tâche', deleteItem: 'Supprimer la tâche',
       markDone: 'Marquer comme faite', markUndone: 'Marquer comme à faire', moveTo: 'Déplacer au',
-      reorder: 'Réordonner', note: 'Note (facultatif)', time: 'Heure (facultatif)', duration: 'Durée',
+      reorder: 'Réordonner', note: 'Note (facultatif)', time: 'Heure (facultatif)', duration: 'Durée', priority: 'Marquer comme important',
     },
     cat: {
       none: 'Aucune', new: 'Nouvelle', name: 'Nom de catégorie', title: 'Catégories', newCategory: 'Nouvelle catégorie',
@@ -430,7 +432,7 @@ export const messages = {
     day: {
       today: 'oggi', addItem: 'Aggiungi attività', itemName: 'Nome attività', deleteItem: 'Elimina attività',
       markDone: 'Segna come fatta', markUndone: 'Segna come da fare', moveTo: 'Sposta al',
-      reorder: 'Riordina', note: 'Nota (facoltativa)', time: 'Ora (facoltativa)', duration: 'Durata',
+      reorder: 'Riordina', note: 'Nota (facoltativa)', time: 'Ora (facoltativa)', duration: 'Durata', priority: 'Segna come importante',
     },
     cat: {
       none: 'Nessuna', new: 'Nuova', name: 'Nome categoria', title: 'Categorie', newCategory: 'Nuova categoria',
@@ -485,7 +487,7 @@ export const messages = {
     day: {
       today: 'hoje', addItem: 'Adicionar tarefa', itemName: 'Nome da tarefa', deleteItem: 'Eliminar tarefa',
       markDone: 'Marcar como feita', markUndone: 'Marcar como pendente', moveTo: 'Mover para',
-      reorder: 'Reordenar', note: 'Nota (opcional)', time: 'Hora (opcional)', duration: 'Duração',
+      reorder: 'Reordenar', note: 'Nota (opcional)', time: 'Hora (opcional)', duration: 'Duração', priority: 'Marcar como importante',
     },
     cat: {
       none: 'Nenhuma', new: 'Nova', name: 'Nome da categoria', title: 'Categorias', newCategory: 'Nova categoria',
