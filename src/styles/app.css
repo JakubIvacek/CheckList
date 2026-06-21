@@ -111,6 +111,26 @@ button{font-family:inherit;}
   color:var(--color-text-info);
 }
 
+/* Shared small action button (sheets, edit forms, stats). Variants:
+   .danger (red text), .brand (accent text), .solid-danger (red fill), .muted (grey fill). */
+.act-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  height:34px;padding:0 14px;
+  border-radius:var(--border-radius-md);
+  border:0.5px solid var(--color-border-secondary);
+  background:var(--color-background-primary);
+  color:var(--color-text-secondary);
+  font-size:14px;font-weight:500;line-height:1;cursor:pointer;flex-shrink:0;
+  transition:transform .1s ease, background-color .15s ease;
+}
+.act-btn i{font-size:16px;}
+.act-btn:active{transform:scale(0.96);}
+.act-btn:disabled{opacity:0.4;cursor:default;}
+.act-btn.danger{color:var(--color-text-danger);}
+.act-btn.brand{color:var(--color-text-info);}
+.act-btn.solid-danger{background:var(--color-text-danger);border-color:transparent;color:#fff;}
+.act-btn.muted{background:var(--color-background-tertiary);border-color:transparent;color:var(--color-text-secondary);}
+
 /* month grid (calendar month + day sheet reuse) */
 .calm-wd{display:grid;grid-template-columns:repeat(7,1fr);padding:0 4px 6px;}
 .calm-wd span{text-align:center;font-size:12px;color:var(--color-text-tertiary);}

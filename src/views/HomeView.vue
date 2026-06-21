@@ -83,6 +83,7 @@
             :ref="el => registerDay(day, el)"
             :date="day.date"
             :tasks="day.tasks"
+            @deleted="keepDayOpen"
           />
           <button
             v-else-if="day.isFuture"
@@ -186,6 +187,11 @@ function registerDay(day: { date: string; isToday: boolean }, el: unknown) {
 function expandDay(date: string) {
   expanded.value.add(date)
   requestAnimationFrame(() => dayRefs.get(date)?.openAdd())
+}
+
+// keep a day mounted (e.g. while an undo row shows) without opening the add form
+function keepDayOpen(date: string) {
+  expanded.value.add(date)
 }
 
 function quickAdd() {

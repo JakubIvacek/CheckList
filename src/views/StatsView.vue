@@ -53,7 +53,7 @@
     <section class="block bordered">
       <div class="block-head">
         <span class="block-title">{{ t('stats.byCategory') }}</span>
-        <button class="manage-link" @click="catSheet = true">{{ t('stats.manage') }}</button>
+        <button class="act-btn brand" @click="catSheet = true">{{ t('stats.manage') }}</button>
       </div>
       <template v-if="catBreakdown.length">
         <div v-for="c in catBreakdown" :key="c.name" class="cat-row">
@@ -451,12 +451,6 @@ onMounted(async () => {
 .block-title { font-size: 15px; font-weight: 500; }
 .block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
 .block-note { font-size: 12px; color: var(--color-text-tertiary); }
-.manage-link {
-  border: 0.5px solid var(--color-border-secondary);
-  background: var(--color-background-primary);
-  color: var(--color-text-info); font-size: 13px; cursor: pointer;
-  padding: 6px 12px; border-radius: var(--border-radius-md);
-}
 .chart-wrap { height: 120px; margin: 14px 0 10px; }
 .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: 8px;

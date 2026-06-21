@@ -42,12 +42,7 @@
             ></textarea>
             <CategoryPicker v-model="editCat" />
             <div class="edit-bottom">
-              <template v-if="confirmDelete">
-                <span class="eb-q">{{ t('common.confirmDelete') }}</span>
-                <button class="confirm-yes" @click="removeTask(task)">{{ t('common.delete') }}</button>
-                <button class="confirm-no" @click="confirmDelete = false">{{ t('common.cancel') }}</button>
-              </template>
-              <template v-else-if="moveOpen">
+              <template v-if="moveOpen">
                 <span class="eb-q">{{ t('day.moveTo') }}</span>
                 <input type="date" v-model="editDate" class="date-input">
                 <button class="add-confirm" @click="applyMove(task)"><i class="ti ti-check"></i></button>
@@ -74,10 +69,10 @@
                     </select>
                   </div>
                   <div class="action-row">
-                    <button class="delete-btn" @click="confirmDelete = true">
+                    <button class="act-btn danger" @click="removeTask(task)">
                       <i class="ti ti-trash"></i> {{ t('common.delete') }}
                     </button>
-                    <button class="move-btn" @click="moveOpen = true">
+                    <button class="act-btn" @click="moveOpen = true">
                       <i class="ti ti-calendar-event"></i> {{ t('day.moveTo') }}
                     </button>
                   </div>
@@ -207,6 +202,9 @@ const props = withDefaults(defineProps<{
   showHeader?: boolean
 }>(), { showHeader: true })
 
+// notify parent (Home) so it can keep this day open while the undo row shows
+const emit = defineEmits<{ deleted: [string] }>()
+
 const tasksStore = useTasksStore()
 const categoriesStore = useCategoriesStore()
 
@@ -251,7 +249,6 @@ watch(editHour, h => { editMin.value = h ? (editMin.value || '00') : '' })
 
 // 'HH'+'MM' selects → 'HH:MM' or null when no hour picked
 const composeTime = (hour: string, min: string) => (hour ? `${hour}:${min || '00'}` : null)
-const confirmDelete = ref(false)
 const moveOpen = ref(false)
 const editEl = ref<HTMLInputElement[] | HTMLInputElement | null>(null)
 
@@ -270,7 +267,6 @@ async function openEdit(task: Task) {
   editHour.value = task.task_time ? task.task_time.slice(0, 2) : ''
   editMin.value = task.task_time ? task.task_time.slice(3, 5) : ''
   editDur.value = task.duration_min != null ? String(task.duration_min) : ''
-  confirmDelete.value = false
   moveOpen.value = false
   await nextTick()
   const el = Array.isArray(editEl.value) ? editEl.value[0] : editEl.value
@@ -348,6 +344,7 @@ const tombTimers = new Map<string, ReturnType<typeof setTimeout>>()
 async function deleteWithUndo(task: Task) {
   const snapshot = { ...task }
   await tasksStore.deleteTask(task.id)
+  emit('deleted', props.date)
   tombstones.value.push(snapshot)
   tombTimers.set(snapshot.id, setTimeout(() => {
     tombstones.value = tombstones.value.filter(x => x.id !== snapshot.id)
@@ -513,23 +510,6 @@ defineExpose({ openAdd })
 .row-text.muted { font-size: 14px; color: var(--color-text-tertiary); }
 .trow-add { background: none; border: none; width: 100%; text-align: left; }
 
-.delete-btn {
-  display: flex; align-items: center; gap: 6px;
-  border: 0.5px solid var(--color-border-secondary);
-  background: var(--color-background-primary); cursor: pointer;
-  color: var(--color-text-danger); font-size: 14px;
-  height: 34px; padding: 0 12px; border-radius: var(--border-radius-md);
-}
-.delete-btn i { font-size: 16px; }
-
-.confirm-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--color-text-secondary); }
-.confirm-yes, .confirm-no {
-  border: none; cursor: pointer; font-size: 13px; font-weight: 500;
-  height: 30px; padding: 0 12px; border-radius: var(--border-radius-md);
-}
-.confirm-yes { background: var(--color-text-danger); color: #fff; }
-.confirm-no { background: var(--color-background-tertiary); color: var(--color-text-secondary); }
-
 .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 .drag-handle {
@@ -540,7 +520,7 @@ defineExpose({ openAdd })
 .drag-handle:active { cursor: grabbing; }
 .drag-ghost { opacity: 0.4; }
 
-.edit-bottom { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 0 5px; }
+.edit-bottom { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 0 5px; }
 .edit-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 0 10%; box-sizing: border-box; }
 @media (max-width: 600px) { .edit-actions { padding: 0 5%; } }
 .time-group { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
@@ -550,14 +530,6 @@ defineExpose({ openAdd })
 .action-row { display: flex; gap: 10px; }
 .action-row > button { flex: 1; justify-content: center; }
 .eb-q { font-size: 14px; color: var(--color-text-secondary); }
-.move-btn {
-  display: flex; align-items: center; gap: 6px;
-  border: 0.5px solid var(--color-border-secondary);
-  background: var(--color-background-primary); cursor: pointer;
-  color: var(--color-text-secondary); font-size: 14px;
-  height: 34px; padding: 0 12px; border-radius: var(--border-radius-md);
-}
-.move-btn i { font-size: 16px; }
 .date-input {
   border: 0.5px solid var(--color-border-secondary);
   border-radius: var(--border-radius-md);
@@ -612,11 +584,10 @@ defineExpose({ openAdd })
 .add-cancel { background: var(--color-background-tertiary); color: var(--color-text-secondary); }
 
 /* subtle press feedback on tap */
-.flag-dot, .add-confirm, .add-cancel, .delete-btn, .move-btn, .tomb-undo {
+.flag-dot, .add-confirm, .add-cancel, .tomb-undo {
   transition: transform .1s ease, background-color .15s ease, color .15s ease;
 }
-.flag-dot:active, .add-confirm:active, .add-cancel:active,
-.delete-btn:active, .move-btn:active, .tomb-undo:active { transform: scale(0.92); }
+.flag-dot:active, .add-confirm:active, .add-cancel:active, .tomb-undo:active { transform: scale(0.92); }
 
 @keyframes check-pop {
   0% { transform: scale(0.2); opacity: 0; }
@@ -633,7 +604,7 @@ defineExpose({ openAdd })
 /* respect users who prefer less motion */
 @media (prefers-reduced-motion: reduce) {
   .check, .check.checked i, .row-text, .row-text::after, .tomb-row,
-  .flag-dot, .add-confirm, .add-cancel, .delete-btn, .move-btn, .tomb-undo {
+  .flag-dot, .add-confirm, .add-cancel, .act-btn, .tomb-undo {
     transition: none !important; animation: none !important;
   }
   .row-text.done { text-decoration: line-through; }

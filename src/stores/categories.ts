@@ -55,7 +55,8 @@ export const useCategoriesStore = defineStore('categories', () => {
     if (c) Object.assign(c, updates)
   }
 
-  async function deleteCategory(id: string) {
+  // returns the ids of tasks that had this category (for undo re-linking)
+  async function deleteCategory(id: string): Promise<string[]> {
     if (!isDemo) {
       const { error } = await supabase.from('categories').delete().eq('id', id)
       if (error) throw error
@@ -63,8 +64,33 @@ export const useCategoriesStore = defineStore('categories', () => {
     categories.value = categories.value.filter(c => c.id !== id)
     // mirror the DB's `on delete set null`: clear the category on loaded tasks
     const tasks = useTasksStore()
-    for (const t of tasks.tasks) if (t.category_id === id) t.category_id = null
+    const affected: string[] = []
+    for (const t of tasks.tasks) if (t.category_id === id) { affected.push(t.id); t.category_id = null }
+    return affected
   }
 
-  return { categories, loaded, byId, color, fetchAll, addCategory, updateCategory, deleteCategory }
+  // re-insert a deleted category (for undo) and re-link the tasks that had it
+  async function restoreCategory(cat: Category, taskIds: string[]) {
+    let newId = cat.id
+    if (isDemo) {
+      categories.value.push({ ...cat })
+    } else {
+      const { data, error } = await supabase
+        .from('categories').insert({ name: cat.name, color: cat.color }).select().single()
+      if (error) throw error
+      categories.value.push(data)
+      newId = data.id
+    }
+    const tasks = useTasksStore()
+    for (const id of taskIds) {
+      const tk = tasks.tasks.find(x => x.id === id)
+      if (tk) tk.category_id = newId
+    }
+    if (!isDemo && taskIds.length) {
+      await Promise.all(taskIds.map(id =>
+        supabase.from('tasks').update({ category_id: newId }).eq('id', id)))
+    }
+  }
+
+  return { categories, loaded, byId, color, fetchAll, addCategory, updateCategory, deleteCategory, restoreCategory }
 })
