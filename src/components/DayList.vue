@@ -86,32 +86,57 @@
             </div>
           </div>
 
-          <!-- normal row -->
-          <div v-else class="trow">
-            <button
-              type="button"
-              class="check"
-              :class="{ checked: task.status === 'done' }"
-              @click="tasksStore.toggleTask(task)"
-              :aria-label="task.status === 'done' ? t('day.markUndone') : t('day.markDone')"
+          <!-- normal row (swipe: → done, ← delete) -->
+          <div v-else class="swipe-wrap">
+            <template v-if="swipeId === task.id">
+              <div v-if="swipeDx > 0" class="swipe-bg left" :class="{ ready: swipeDx > SWIPE_TH }">
+                <i class="ti" :class="task.status === 'done' ? 'ti-rotate-2' : 'ti-check'"></i>
+              </div>
+              <div v-else-if="swipeDx < 0" class="swipe-bg right" :class="{ ready: swipeDx < -SWIPE_TH }">
+                <i class="ti ti-trash"></i>
+              </div>
+            </template>
+            <div
+              class="trow"
+              :class="{ swiping: swipeId === task.id, today: isToday }"
+              :style="swipeStyle(task.id)"
+              @touchstart="onRowDown($event, task)"
+              @touchmove="onRowMove($event, task)"
+              @touchend="onRowUp($event, task)"
             >
-              <i v-if="task.status === 'done'" class="ti ti-check"></i>
-            </button>
-            <span v-if="task.task_time || task.duration_min" class="row-time" :class="{ done: task.status === 'done' }">{{ timeLabel(task) }}</span>
-            <button type="button" class="row-text-btn" @click="openEdit(task)">
-              <span class="row-text" :class="{ done: task.status === 'done' }">{{ task.title }}</span>
-              <span v-if="task.note" class="row-note">{{ task.note }}</span>
-            </button>
-            <span
-              v-if="catColor(task.category_id)"
-              class="cat-dot"
-              :style="{ background: catColor(task.category_id)! }"
-            ></span>
-            <span class="drag-handle" :aria-label="t('day.reorder')"><i class="ti ti-grip-vertical"></i></span>
+              <button
+                type="button"
+                class="check"
+                :class="{ checked: task.status === 'done' }"
+                @click="tasksStore.toggleTask(task)"
+                :aria-label="task.status === 'done' ? t('day.markUndone') : t('day.markDone')"
+              >
+                <i v-if="task.status === 'done'" class="ti ti-check"></i>
+              </button>
+              <span v-if="task.task_time || task.duration_min" class="row-time" :class="{ done: task.status === 'done' }">{{ timeLabel(task) }}</span>
+              <button type="button" class="row-text-btn" @click="openEdit(task)">
+                <span class="row-text" :class="{ done: task.status === 'done' }">{{ task.title }}</span>
+                <span v-if="task.note" class="row-note">{{ task.note }}</span>
+              </button>
+              <span
+                v-if="catColor(task.category_id)"
+                class="cat-dot"
+                :style="{ background: catColor(task.category_id)! }"
+              ></span>
+              <span class="drag-handle" :aria-label="t('day.reorder')"><i class="ti ti-grip-vertical"></i></span>
+            </div>
           </div>
         </div>
       </template>
     </draggable>
+
+    <div v-for="tomb in tombstones" :key="'tomb-' + tomb.id" class="trow tomb-row">
+      <span class="tomb-icon"><i class="ti ti-trash"></i></span>
+      <span class="tomb-text">{{ tomb.title }}</span>
+      <button type="button" class="tomb-undo" @click="undoTomb(tomb)">
+        <i class="ti ti-arrow-back-up"></i> {{ t('undo.action') }}
+      </button>
+    </div>
 
     <template v-if="canAdd">
       <div v-if="adding" class="add-form">
@@ -265,13 +290,74 @@ function onReorder(ordered: Task[]) {
   tasksStore.reorderTasks(props.date, ordered.map(x => x.id))
 }
 
+// Swipe a task row: → mark done/undone, ← delete. (touch only)
+const SWIPE_TH = 80
+const swipeId = ref<string | null>(null)
+const swipeDx = ref(0)
+let sx = 0, sy = 0, swiping = false, horizontal = false
+
+function swipeStyle(id: string) {
+  if (swipeId.value !== id) return undefined
+  return { transform: `translateX(${swipeDx.value}px)`, transition: 'none' }
+}
+
+function onRowDown(e: TouchEvent, task: Task) {
+  sx = e.touches[0].clientX; sy = e.touches[0].clientY
+  swiping = true; horizontal = false
+  swipeId.value = task.id; swipeDx.value = 0
+}
+
+function onRowMove(e: TouchEvent, _task: Task) {
+  if (!swiping) return
+  const dx = e.touches[0].clientX - sx
+  const dy = e.touches[0].clientY - sy
+  if (!horizontal) {
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) horizontal = true
+    else if (Math.abs(dy) > 10) { swiping = false; swipeId.value = null; return } // vertical scroll
+    else return
+  }
+  e.preventDefault()        // lock to horizontal, stop the list scrolling
+  e.stopPropagation()       // don't trigger week-swipe on the home root
+  swipeDx.value = dx
+}
+
+function onRowUp(e: TouchEvent, task: Task) {
+  if (horizontal) e.stopPropagation()
+  const dx = swipeDx.value
+  swiping = false; horizontal = false
+  swipeId.value = null; swipeDx.value = 0
+  if (dx > SWIPE_TH) tasksStore.toggleTask(task)
+  else if (dx < -SWIPE_TH) deleteWithUndo(task)
+}
+
+// Delete, leaving an inline "deleted · undo" tombstone row in its place for ~5s.
+const tombstones = ref<Task[]>([])
+const tombTimers = new Map<string, ReturnType<typeof setTimeout>>()
+
+async function deleteWithUndo(task: Task) {
+  const snapshot = { ...task }
+  await tasksStore.deleteTask(task.id)
+  tombstones.value.push(snapshot)
+  tombTimers.set(snapshot.id, setTimeout(() => {
+    tombstones.value = tombstones.value.filter(x => x.id !== snapshot.id)
+    tombTimers.delete(snapshot.id)
+  }, 5000))
+}
+
+async function undoTomb(tomb: Task) {
+  const tmr = tombTimers.get(tomb.id)
+  if (tmr) { clearTimeout(tmr); tombTimers.delete(tomb.id) }
+  tombstones.value = tombstones.value.filter(x => x.id !== tomb.id)
+  await tasksStore.restoreTask(tomb)
+}
+
 function cancelEdit() {
   editingId.value = null
 }
 
 async function removeTask(task: Task) {
-  await tasksStore.deleteTask(task.id)
   editingId.value = null
+  await deleteWithUndo(task)
 }
 
 const isToday = computed(() => props.date === today())
@@ -339,6 +425,32 @@ defineExpose({ openAdd })
   padding: 6px 0;
   cursor: pointer;
 }
+
+/* swipe: → done, ← delete (mobile) */
+.swipe-wrap { position: relative; overflow: hidden; }
+.swipe-bg {
+  position: absolute; inset: 0;
+  display: flex; align-items: center;
+  padding: 0 18px; color: #fff; font-size: 18px;
+  filter: saturate(0.85) brightness(0.85); transition: filter .1s;
+}
+.swipe-bg.ready { filter: none; }
+.swipe-bg.left { justify-content: flex-start; background: var(--color-text-success); }
+.swipe-bg.right { justify-content: flex-end; background: var(--color-text-danger); }
+.swipe-wrap .trow.swiping { position: relative; background: var(--color-background-primary); transition: transform .2s; }
+.swipe-wrap .trow.swiping.today { background: var(--color-background-secondary); }
+
+/* inline undo row left where a deleted task was */
+.tomb-row { gap: 11px; color: var(--color-text-tertiary); cursor: default; }
+.tomb-icon { display: flex; align-items: center; font-size: 16px; }
+.tomb-text { flex: 1; min-width: 0; font-size: 15px; text-decoration: line-through; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tomb-undo {
+  display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+  border: none; cursor: pointer; padding: 5px 12px; border-radius: 999px;
+  background: var(--color-background-info); color: var(--color-text-info);
+  font-size: 13px; font-weight: 500;
+}
+.tomb-undo i { font-size: 15px; }
 .check {
   width: 22px; height: 22px;
   border-radius: 50%;

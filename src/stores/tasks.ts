@@ -77,6 +77,19 @@ export const useTasksStore = defineStore('tasks', () => {
     tasks.value = tasks.value.filter(t => t.id !== id)
   }
 
+  // Re-insert a previously deleted task (for undo). Keeps its day/position/state;
+  // in real DB it gets a fresh id (id is never referenced elsewhere).
+  async function restoreTask(task: Task) {
+    if (isDemo) {
+      tasks.value.push({ ...task })
+      return
+    }
+    const { id: _id, ...fields } = task
+    const { data, error } = await supabase.from('tasks').insert(fields).select().single()
+    if (error) throw error
+    tasks.value.push(data)
+  }
+
   async function updateTask(id: string, updates: Partial<Task>) {
     // when moving a task to another day, append it to the end of that day
     if (updates.task_date) {
@@ -110,5 +123,5 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  return { tasks, loading, fetchRange, addTask, toggleTask, deleteTask, updateTask, reorderTasks }
+  return { tasks, loading, fetchRange, addTask, toggleTask, deleteTask, restoreTask, updateTask, reorderTasks }
 })

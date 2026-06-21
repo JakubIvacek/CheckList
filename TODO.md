@@ -9,8 +9,6 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 - [ ] **Opakujúce sa úlohy** (M–L) — denne / týždenne; každý výskyt = samostatný task. Treba stĺpec `repeat` + generovanie výskytov + „zmazať tento / celú sériu".
 
 ## Gestá / UX
-- [ ] **Swipe na úlohe** (M) — swipe = hotovo / zmazať. 🔥 (mobil)
-- [ ] **Undo po zmazaní** (S–M) — snackbar „Späť" namiesto/popri confirme.
 - [ ] **Animácie / haptika** (S) — jemné prechody, vibrácia pri akcii.
 
 ## Štatistiky
@@ -39,6 +37,8 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 ---
 
 ## Hotovo
+- [x] Swipe na úlohe (mobil) — → hotovo/nehotovo, ← zmazať (prah 80px, farebný podklad, nekoliduje s prepínaním týždňov).
+- [x] Undo po zmazaní — inline riadok „Späť" (~5 s) na mieste zmazanej úlohy (swipe aj tlačidlo Delete); vráti úlohu vrátane poradia.
 - [x] Čas úlohy — voliteľný čas dňa (hodina:minúta select, 24h) + odhad trvania (15m–12h); riadok ukazuje „14:00 · 2h", zoradenie podľa času.
 - [x] Color picker pre kategóriu — vlastná farba (natívny `color` input s kvapkadlom) popri preset palete.
 - [x] Štatistiky — heatmapa aktivity (GitHub-style) + insight podľa obdobia (najsilnejší deň/týždeň/mesiac).
