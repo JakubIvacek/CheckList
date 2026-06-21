@@ -59,10 +59,10 @@ function tasksForDate(dateStr: string, todayStr: string): Task[] {
     // ~1 of every 3 tasks gets a time of day (08:00–20:00), the rest stay untimed
     const th = hash(dateStr + ':time:' + i)
     const task_time = th % 3 === 0 ? `${String(8 + (th >> 3) % 13).padStart(2, '0')}:${(th >> 6) % 2 ? '30' : '00'}` : null
-    // ~1 of every 3 tasks gets an estimated duration
+    // a timed task sometimes gets an end (stored as duration in minutes)
     const dh = hash(dateStr + ':dur:' + i)
     const DURS = [15, 30, 45, 60, 90, 120]
-    const duration_min = dh % 3 === 0 ? DURS[(dh >> 4) % DURS.length] : null
+    const duration_min = task_time && dh % 2 === 0 ? DURS[(dh >> 4) % DURS.length] : null
     // ~1 of every 5 tasks is flagged as important
     const priority = hash(dateStr + ':pri:' + i) % 5 === 0
     out.push({

@@ -40,19 +40,20 @@ export const useTasksStore = defineStore('tasks', () => {
     category_id: string | null = null,
     task_time: string | null = null,
     duration_min: number | null = null,
+    note: string | null = null,
   ) {
     const position = nextPosition(task_date)
     if (isDemo) {
       tasks.value.push({
         id: `demo-${crypto.randomUUID()}`,
         title, task_date, task_time, duration_min, priority: false, status: 'todo',
-        category_id, note: null, position,
+        category_id, note, position,
         created_at: new Date().toISOString(), completed_at: null,
       })
       return
     }
     const { data, error } = await supabase
-      .from('tasks').insert({ title, task_date, task_time, duration_min, category_id, position }).select().single()
+      .from('tasks').insert({ title, task_date, task_time, duration_min, category_id, note, position }).select().single()
     if (error) throw error
     tasks.value.push(data)
   }

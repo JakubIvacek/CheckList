@@ -50,23 +50,31 @@
               </template>
               <template v-else>
                 <div class="edit-actions">
-                  <div class="time-row">
-                    <div class="time-group">
-                      <select v-model="editHour" class="time-sel" :aria-label="t('day.time')">
+                  <div class="meta-row">
+                    <div class="field">
+                      <span class="field-label">{{ t('day.from') }}</span>
+                      <select v-model="editHour" :aria-label="t('day.from')">
                         <option value="">--</option>
                         <option v-for="h in HOURS" :key="h" :value="h">{{ h }}</option>
                       </select>
-                      <span class="unit">h</span>
-                      <select v-model="editMin" class="time-sel" :aria-label="t('day.time')">
+                      <span class="colon">:</span>
+                      <select v-model="editMin" :aria-label="t('day.from')">
                         <option value="">--</option>
                         <option v-for="m in MINUTES" :key="m" :value="m">{{ m }}</option>
                       </select>
-                      <span class="unit">m</span>
                     </div>
-                    <select v-model="editDur" class="dur-input" :aria-label="t('day.duration')">
-                      <option value="">{{ t('day.duration') }}</option>
-                      <option v-for="m in DURATIONS" :key="m" :value="String(m)">{{ fmtDur(m) }}</option>
-                    </select>
+                    <div class="field">
+                      <span class="field-label">{{ t('day.to') }}</span>
+                      <select v-model="editEndHour" :aria-label="t('day.to')">
+                        <option value="">--</option>
+                        <option v-for="h in HOURS" :key="h" :value="h">{{ h }}</option>
+                      </select>
+                      <span class="colon">:</span>
+                      <select v-model="editEndMin" :aria-label="t('day.to')">
+                        <option value="">--</option>
+                        <option v-for="m in MINUTES" :key="m" :value="m">{{ m }}</option>
+                      </select>
+                    </div>
                   </div>
                   <div class="action-row">
                     <button class="act-btn danger" @click="removeTask(task)">
@@ -108,10 +116,13 @@
               >
                 <i v-if="task.status === 'done'" class="ti ti-check"></i>
               </button>
-              <span v-if="task.task_time || task.duration_min" class="row-time" :class="{ done: task.status === 'done' }">{{ timeLabel(task) }}</span>
               <button type="button" class="row-text-btn" @click="openEdit(task)">
                 <span class="row-text" :class="{ done: task.status === 'done' }">{{ task.title }}</span>
-                <span v-if="task.note" class="row-note">{{ task.note }}</span>
+                <span v-if="task.task_time || task.note" class="row-sub">
+                  <span v-if="task.task_time" class="row-sub-time">{{ timeLabel(task) }}</span>
+                  <span v-if="task.task_time && task.note" class="row-sub-sep">·</span>
+                  <span v-if="task.note" class="row-sub-note">{{ task.note }}</span>
+                </span>
               </button>
               <span
                 v-if="catColor(task.category_id)"
@@ -154,23 +165,37 @@
           <button class="add-confirm" @click="submit"><i class="ti ti-check"></i></button>
           <button class="add-cancel" @click="cancel"><i class="ti ti-x"></i></button>
         </div>
-        <div class="time-row">
-          <div class="time-group">
-            <select v-model="newHour" class="time-sel" :aria-label="t('day.time')">
+        <textarea
+          v-model="newNote"
+          class="note-input"
+          rows="2"
+          :placeholder="t('day.note')"
+        ></textarea>
+        <div class="meta-row">
+          <div class="field">
+            <span class="field-label">{{ t('day.from') }}</span>
+            <select v-model="newHour" :aria-label="t('day.from')">
               <option value="">--</option>
               <option v-for="h in HOURS" :key="h" :value="h">{{ h }}</option>
             </select>
-            <span class="unit">h</span>
-            <select v-model="newMin" class="time-sel" :aria-label="t('day.time')">
+            <span class="colon">:</span>
+            <select v-model="newMin" :aria-label="t('day.from')">
               <option value="">--</option>
               <option v-for="m in MINUTES" :key="m" :value="m">{{ m }}</option>
             </select>
-            <span class="unit">m</span>
           </div>
-          <select v-model="newDur" class="dur-input" :aria-label="t('day.duration')">
-            <option value="">{{ t('day.duration') }}</option>
-            <option v-for="m in DURATIONS" :key="m" :value="String(m)">{{ fmtDur(m) }}</option>
-          </select>
+          <div class="field">
+            <span class="field-label">{{ t('day.to') }}</span>
+            <select v-model="newEndHour" :aria-label="t('day.to')">
+              <option value="">--</option>
+              <option v-for="h in HOURS" :key="h" :value="h">{{ h }}</option>
+            </select>
+            <span class="colon">:</span>
+            <select v-model="newEndMin" :aria-label="t('day.to')">
+              <option value="">--</option>
+              <option v-for="m in MINUTES" :key="m" :value="m">{{ m }}</option>
+            </select>
+          </div>
         </div>
         <CategoryPicker v-model="selectedCat" />
       </div>
@@ -208,29 +233,27 @@ const emit = defineEmits<{ deleted: [string] }>()
 const tasksStore = useTasksStore()
 const categoriesStore = useCategoriesStore()
 
-const DURATIONS = [15, 30, 45, 60, 90, 120, 180, 240, 480, 720]
 const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'))
 const MINUTES = Array.from({ length: 12 }, (_, i) => String(i * 5).padStart(2, '0'))
 
-function fmtDur(min: number): string {
-  if (min < 60) return `${min}m`
-  const h = min / 60
-  return `${Number.isInteger(h) ? h : h.toFixed(1)}h`
-}
+const toMin = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5))
+const minToHHMM = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
 
+// task_time = start 'HH:MM', duration_min = (end - start) minutes → render "14:00–15:30"
 function timeLabel(task: Task): string {
-  const time = task.task_time ? task.task_time.slice(0, 5) : ''
-  const dur = task.duration_min ? fmtDur(task.duration_min) : ''
-  if (time && dur) return `${time} · ${dur}`
-  if (time) return time
-  return `~${dur}`
+  if (!task.task_time) return ''
+  const start = task.task_time.slice(0, 5)
+  if (task.duration_min) return `${start}–${minToHHMM(toMin(start) + task.duration_min)}`
+  return start
 }
 
 const adding = ref(false)
 const newTitle = ref('')
+const newNote = ref('')
 const newHour = ref('')
 const newMin = ref('')
-const newDur = ref('')
+const newEndHour = ref('')
+const newEndMin = ref('')
 const selectedCat = ref<string | null>(null)
 const inputEl = ref<HTMLInputElement | null>(null)
 
@@ -241,14 +264,26 @@ const editDate = ref('')
 const editNote = ref('')
 const editHour = ref('')
 const editMin = ref('')
-const editDur = ref('')
+const editEndHour = ref('')
+const editEndMin = ref('')
 
 // Minute mirrors the hour: no hour → '--', picking an hour defaults minute to '00'.
 watch(newHour, h => { newMin.value = h ? (newMin.value || '00') : '' })
 watch(editHour, h => { editMin.value = h ? (editMin.value || '00') : '' })
+watch(newEndHour, h => { newEndMin.value = h ? (newEndMin.value || '00') : '' })
+watch(editEndHour, h => { editEndMin.value = h ? (editEndMin.value || '00') : '' })
+// clearing the start also clears the end
+watch(newHour, h => { if (!h) { newEndHour.value = ''; newEndMin.value = '' } })
+watch(editHour, h => { if (!h) { editEndHour.value = ''; editEndMin.value = '' } })
 
 // 'HH'+'MM' selects → 'HH:MM' or null when no hour picked
 const composeTime = (hour: string, min: string) => (hour ? `${hour}:${min || '00'}` : null)
+// minutes between start and end (both 'HH'+'MM'); null unless end is after start
+function durFrom(start: string | null, endH: string, endM: string): number | null {
+  if (!start || !endH) return null
+  const diff = toMin(`${endH}:${endM || '00'}`) - toMin(start)
+  return diff > 0 ? diff : null
+}
 const moveOpen = ref(false)
 const editEl = ref<HTMLInputElement[] | HTMLInputElement | null>(null)
 
@@ -266,7 +301,15 @@ async function openEdit(task: Task) {
   editNote.value = task.note ?? ''
   editHour.value = task.task_time ? task.task_time.slice(0, 2) : ''
   editMin.value = task.task_time ? task.task_time.slice(3, 5) : ''
-  editDur.value = task.duration_min != null ? String(task.duration_min) : ''
+  // end = start + duration
+  if (task.task_time && task.duration_min) {
+    const end = minToHHMM(toMin(task.task_time.slice(0, 5)) + task.duration_min)
+    editEndHour.value = end.slice(0, 2)
+    editEndMin.value = end.slice(3, 5)
+  } else {
+    editEndHour.value = ''
+    editEndMin.value = ''
+  }
   moveOpen.value = false
   await nextTick()
   const el = Array.isArray(editEl.value) ? editEl.value[0] : editEl.value
@@ -276,10 +319,11 @@ async function openEdit(task: Task) {
 async function saveEdit(task: Task) {
   const title = editTitle.value.trim()
   if (!title) return
+  const start = composeTime(editHour.value, editMin.value)
   await tasksStore.updateTask(task.id, {
     title, category_id: editCat.value, note: editNote.value.trim() || null,
-    task_time: composeTime(editHour.value, editMin.value),
-    duration_min: editDur.value ? Number(editDur.value) : null,
+    task_time: start,
+    duration_min: durFrom(start, editEndHour.value, editEndMin.value),
   })
   editingId.value = null
 }
@@ -385,24 +429,30 @@ async function openAdd() {
 async function submit() {
   const title = newTitle.value.trim()
   if (!title) return
+  const start = composeTime(newHour.value, newMin.value)
   await tasksStore.addTask(
     title, props.date, selectedCat.value,
-    composeTime(newHour.value, newMin.value),
-    newDur.value ? Number(newDur.value) : null,
+    start,
+    durFrom(start, newEndHour.value, newEndMin.value),
+    newNote.value.trim() || null,
   )
   newTitle.value = ''
+  newNote.value = ''
   newHour.value = ''
   newMin.value = ''
-  newDur.value = ''
+  newEndHour.value = ''
+  newEndMin.value = ''
   selectedCat.value = null
   adding.value = false
 }
 
 function cancel() {
   newTitle.value = ''
+  newNote.value = ''
   newHour.value = ''
   newMin.value = ''
-  newDur.value = ''
+  newEndHour.value = ''
+  newEndMin.value = ''
   adding.value = false
 }
 
@@ -481,15 +531,11 @@ defineExpose({ openAdd })
 .check.dashed i { font-size: 13px; }
 
 .row-text-btn { flex: 1; min-width: 0; border: none; background: none; text-align: left; padding: 0; cursor: text; display: flex; flex-direction: column; gap: 2px; }
-.row-note {
-  font-size: 12px; color: var(--color-text-tertiary);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
-}
-.row-time {
-  flex-shrink: 0; font-size: 13px; font-variant-numeric: tabular-nums;
-  color: var(--color-text-secondary); min-width: 38px;
-}
-.row-time.done { color: var(--color-text-tertiary); text-decoration: line-through; }
+/* small sub-line under the title: time then note */
+.row-sub { display: flex; align-items: baseline; gap: 5px; min-width: 0; font-size: 12px; }
+.row-sub-time { flex-shrink: 0; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; }
+.row-sub-sep { flex-shrink: 0; color: var(--color-text-tertiary); }
+.row-sub-note { min-width: 0; color: var(--color-text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .row-text {
   font-size: 15px; color: var(--color-text-primary);
   position: relative; align-self: flex-start; max-width: 100%;
@@ -523,10 +569,23 @@ defineExpose({ openAdd })
 .edit-bottom { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 0 5px; }
 .edit-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 0 10%; box-sizing: border-box; }
 @media (max-width: 600px) { .edit-actions { padding: 0 5%; } }
-.time-group { display: flex; align-items: center; gap: 4px; flex: 1; min-width: 0; }
-.time-group .time-sel { flex: 1; min-width: 0; text-align: center; }
-.unit { font-size: 12px; color: var(--color-text-tertiary); }
-.time-row .dur-input { flex: 1; min-width: 0; }
+.meta-row { display: flex; gap: 10px; }
+.field {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 4px;
+  height: 38px; padding: 0 10px;
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  background: var(--color-background-primary);
+}
+.field-label { font-size: 12px; color: var(--color-text-tertiary); flex-shrink: 0; margin-right: 2px; }
+.field select {
+  border: none; background: var(--color-background-primary); color: var(--color-text-primary);
+  font-size: 15px; padding: 0; cursor: pointer; font-family: inherit;
+  flex: 1; min-width: 0; text-align: center;
+}
+.field select:focus { outline: none; }
+.field .colon { color: var(--color-text-tertiary); }
 .action-row { display: flex; gap: 10px; }
 .action-row > button { flex: 1; justify-content: center; }
 .eb-q { font-size: 14px; color: var(--color-text-secondary); }
@@ -565,16 +624,6 @@ defineExpose({ openAdd })
   padding: 8px 10px; font-size: 14px; font-family: inherit; resize: vertical;
 }
 .note-input:focus { outline: none; border-color: var(--color-text-info); }
-.time-row { display: flex; align-items: center; gap: 8px; color: var(--color-text-tertiary); }
-.time-sel, .dur-input {
-  border: 0.5px solid var(--color-border-secondary);
-  border-radius: var(--border-radius-md);
-  background: var(--color-background-primary);
-  color: var(--color-text-primary);
-  height: 34px; padding: 0 8px; font-size: 14px; font-family: inherit; cursor: pointer;
-}
-.time-sel:focus, .dur-input:focus { outline: none; border-color: var(--color-text-info); }
-.time-sel:disabled { opacity: 0.5; cursor: default; }
 .add-confirm, .add-cancel {
   width: 34px; height: 34px; border-radius: var(--border-radius-md);
   border: none; cursor: pointer; flex-shrink: 0;
