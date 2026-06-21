@@ -51,10 +51,7 @@
 
     <!-- category breakdown -->
     <section class="block bordered">
-      <div class="block-head">
-        <span class="block-title">{{ t('stats.byCategory') }}</span>
-        <button class="act-btn brand" @click="catSheet = true">{{ t('stats.manage') }}</button>
-      </div>
+      <div class="block-title">{{ t('stats.byCategory') }}</div>
       <template v-if="catBreakdown.length">
         <div v-for="c in catBreakdown" :key="c.name" class="cat-row">
           <span class="cat-name">{{ c.name }}</span>
@@ -64,6 +61,7 @@
       </template>
       <p v-else class="block-note">{{ t('stats.noneDone') }}</p>
     </section>
+    <!-- (category management lives on Home) -->
 
     <!-- activity heatmap (long-range, period-independent) -->
     <section class="block bordered">
@@ -100,8 +98,6 @@
         <span>{{ t('stats.more') }}</span>
       </div>
     </section>
-
-    <CategoriesSheet v-model="catSheet" />
   </div>
 </template>
 
@@ -114,7 +110,6 @@ import {
 import { useI18n } from 'vue-i18n'
 import { useTasksStore } from '@/stores/tasks'
 import { useCategoriesStore } from '@/stores/categories'
-import CategoriesSheet from '@/components/CategoriesSheet.vue'
 import { useFmt } from '@/i18n/dates'
 import { addDays, getMonday, parseYmd, today, weekdayIndex, ymd } from '@/lib/dates'
 
@@ -125,7 +120,6 @@ const fmt = useFmt()
 const tasksStore = useTasksStore()
 const categoriesStore = useCategoriesStore()
 const todayStr = today()
-const catSheet = ref(false)
 
 const periods = ['week', 'month', 'year'] as const
 const period = ref<'week' | 'month' | 'year'>('week')
@@ -450,6 +444,7 @@ onMounted(async () => {
 .block.bordered { border-top: 0.5px solid var(--color-border-tertiary); margin-top: 8px; padding-bottom: 16px; }
 .block-title { font-size: 15px; font-weight: 500; }
 .block-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.block > .block-title { margin-bottom: 12px; }
 .block-note { font-size: 12px; color: var(--color-text-tertiary); }
 .chart-wrap { height: 120px; margin: 14px 0 10px; }
 .empty-state {

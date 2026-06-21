@@ -10,16 +10,7 @@
       <span class="day-count" :class="{ done: allDone }">{{ doneCount }} / {{ tasks.length }}</span>
     </div>
 
-    <draggable
-      :model-value="tasks"
-      item-key="id"
-      handle=".drag-handle"
-      :animation="150"
-      ghost-class="drag-ghost"
-      @update:model-value="onReorder"
-    >
-      <template #item="{ element: task }">
-        <div class="day-item">
+    <div v-for="task in tasks" :key="task.id" class="day-item">
           <!-- edit mode -->
           <div v-if="editingId === task.id" class="add-form edit-form">
             <div class="add-input-row">
@@ -136,12 +127,9 @@
                 @click.stop="toggleFlag(task)"
                 :aria-label="t('day.priority')"
               ><i class="ti ti-flag"></i></button>
-              <span class="drag-handle" :aria-label="t('day.reorder')"><i class="ti ti-grip-vertical"></i></span>
             </div>
           </div>
         </div>
-      </template>
-    </draggable>
 
     <div v-for="tomb in tombstones" :key="'tomb-' + tomb.id" class="trow tomb-row">
       <span class="tomb-icon"><i class="ti ti-trash"></i></span>
@@ -210,7 +198,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import draggable from 'vuedraggable'
 import { useTasksStore } from '@/stores/tasks'
 import { useCategoriesStore } from '@/stores/categories'
 import CategoryPicker from '@/components/CategoryPicker.vue'
@@ -335,10 +322,6 @@ async function applyMove(task: Task) {
   } else {
     moveOpen.value = false
   }
-}
-
-function onReorder(ordered: Task[]) {
-  tasksStore.reorderTasks(props.date, ordered.map(x => x.id))
 }
 
 // Swipe a task row: → mark done/undone, ← delete. (touch only)
@@ -558,13 +541,6 @@ defineExpose({ openAdd })
 
 .cat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-.drag-handle {
-  display: flex; align-items: center; flex-shrink: 0;
-  color: var(--color-text-tertiary); font-size: 18px;
-  cursor: grab; padding: 0 2px; touch-action: none;
-}
-.drag-handle:active { cursor: grabbing; }
-.drag-ghost { opacity: 0.4; }
 
 .edit-bottom { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; padding: 0 5px; }
 .edit-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; padding: 0 10%; box-sizing: border-box; }

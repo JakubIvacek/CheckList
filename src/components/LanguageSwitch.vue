@@ -1,5 +1,12 @@
 <template>
-  <select class="lang" :value="locale" @change="onChange" :aria-label="t('account.language')">
+  <!-- compact: globe icon with an invisible native select on top (opens the menu) -->
+  <label v-if="compact" class="lang-icon" :aria-label="t('account.language')">
+    <i class="ti ti-world"></i>
+    <select :value="locale" @change="onChange" :aria-label="t('account.language')">
+      <option v-for="l in LOCALES" :key="l.id" :value="l.id">{{ l.label }}</option>
+    </select>
+  </label>
+  <select v-else class="lang" :value="locale" @change="onChange" :aria-label="t('account.language')">
     <option v-for="l in LOCALES" :key="l.id" :value="l.id">{{ l.label }}</option>
   </select>
 </template>
@@ -8,6 +15,8 @@
 import { useI18n } from 'vue-i18n'
 import { LOCALES, setLocale } from '@/i18n'
 import type { AppLocale } from '@/i18n/messages'
+
+defineProps<{ compact?: boolean }>()
 
 const { t, locale } = useI18n()
 function onChange(e: Event) {
@@ -31,4 +40,16 @@ function onChange(e: Event) {
   background-repeat: no-repeat;
 }
 .lang:focus { outline: none; border-color: var(--color-text-info); }
+
+.lang-icon {
+  position: relative;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-text-secondary); font-size: 19px; cursor: pointer;
+}
+.lang-icon:active { background: var(--color-background-secondary); }
+.lang-icon select {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  border: none; padding: 0; width: 100%; height: 100%;
+}
 </style>

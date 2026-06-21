@@ -6,7 +6,7 @@
       <main class="app-main">
         <RouterView />
       </main>
-      <TabBar />
+      <TabBar v-if="$route.path !== '/account'" />
     </template>
   </div>
 </template>

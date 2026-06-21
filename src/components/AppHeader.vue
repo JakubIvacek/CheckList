@@ -5,7 +5,7 @@
       <span class="app-name">Stride</span>
     </div>
     <div class="app-actions">
-      <LanguageSwitch />
+      <LanguageSwitch compact />
       <RouterLink to="/account" class="settings" :aria-label="t('account.title')">
         <i class="ti ti-settings"></i>
       </RouterLink>
