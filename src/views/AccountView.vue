@@ -36,6 +36,19 @@
           <span class="row-label">{{ t('account.categories') }}</span>
           <span class="row-value">{{ categoriesStore.categories.length }}<i class="ti ti-chevron-right"></i></span>
         </button>
+        <div class="divider"></div>
+        <div class="ac-row select-row">
+          <span class="row-label">{{ t('stats.weeklyGoal') }}</span>
+          <span class="row-value">{{ weeklyGoal }}<i class="ti ti-chevron-right"></i></span>
+          <select
+            class="row-select"
+            :value="weeklyGoal"
+            @change="setWeeklyGoal(Number(($event.target as HTMLSelectElement).value))"
+            :aria-label="t('stats.weeklyGoal')"
+          >
+            <option v-for="n in goalRange" :key="n" :value="n">{{ n }}</option>
+          </select>
+        </div>
       </section>
 
       <div class="sec-label">{{ t('account.secAccount') }}</div>
@@ -168,6 +181,9 @@ import CategoriesSheet from '@/components/CategoriesSheet.vue'
 import { applyTheme, getTheme, type Theme } from '@/lib/theme'
 import { isDemo } from '@/lib/demo'
 import { exportBackup, importBackup } from '@/lib/backup'
+import { weeklyGoal, setWeeklyGoal } from '@/lib/goal'
+
+const goalRange = Array.from({ length: 50 }, (_, i) => i + 1)
 
 const { t } = useI18n()
 const router = useRouter()
@@ -350,6 +366,10 @@ function goBack() {
 .data-note { font-size: 12px; color: var(--color-text-tertiary); margin: 6px 4px 0; line-height: 1.4; }
 .data-msg { font-size: 13px; margin: 8px 4px 0; color: var(--color-text-success); }
 .data-msg.error { color: var(--color-text-danger); }
+
+.select-row { position: relative; }
+.select-row .row-value i { font-size: 18px; }
+.row-select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; }
 
 .seg { display: flex; background: var(--color-background-tertiary); border-radius: 9px; padding: 2px; }
 .seg button {

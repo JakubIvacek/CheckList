@@ -28,6 +28,17 @@
       </div>
     </div>
 
+    <!-- weekly goal (set in Settings; progress over the current ISO week) -->
+    <div class="goal-card">
+      <div class="goal-head">
+        <span class="goal-label">{{ t('stats.weeklyGoal') }}</span>
+        <span class="goal-num" :class="{ reached: weekDone >= weeklyGoal }">{{ weekDone }} / {{ weeklyGoal }}</span>
+      </div>
+      <div class="goal-track">
+        <div class="goal-fill" :class="{ reached: weekDone >= weeklyGoal }" :style="{ width: goalPct + '%' }"></div>
+      </div>
+    </div>
+
     <!-- period bar chart (count ↔ completion %) -->
     <section class="block">
       <div class="block-head">
@@ -112,6 +123,7 @@ import { useTasksStore } from '@/stores/tasks'
 import { useCategoriesStore } from '@/stores/categories'
 import { useFmt } from '@/i18n/dates'
 import { addDays, getMonday, parseYmd, today, weekdayIndex, ymd } from '@/lib/dates'
+import { weeklyGoal } from '@/lib/goal'
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip)
 
@@ -158,6 +170,13 @@ const completion = computed(() => {
   const total = periodTasks.value.length
   return total ? Math.round(periodDone.value / total * 100) : 0
 })
+
+// --- weekly goal (personal target; set in Settings, progress over current week) ---
+const weekDone = computed(() => {
+  const mon = getMonday(todayStr), sun = addDays(mon, 6)
+  return tasksStore.tasks.filter(t => t.status === 'done' && t.task_date >= mon && t.task_date <= sun).length
+})
+const goalPct = computed(() => Math.min(100, Math.round(weekDone.value / weeklyGoal.value * 100)))
 
 // --- streaks: walk days backward; done day counts, missed breaks, empty skips ---
 function dayState(date: string): 'done' | 'missed' | 'none' {
@@ -439,6 +458,15 @@ onMounted(async () => {
 .metric-value { font-size: 24px; font-weight: 500; display: flex; align-items: center; gap: 5px; }
 .metric-value.green { color: var(--color-text-success); }
 .metric-value.flame i { font-size: 20px; color: var(--color-text-danger); }
+
+.goal-card { margin: 5px 18px 6px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 14px; }
+.goal-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; }
+.goal-label { font-size: 13px; color: var(--color-text-secondary); }
+.goal-num { font-size: 16px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.goal-num.reached { color: var(--color-text-success); }
+.goal-track { height: 8px; border-radius: 5px; background: var(--color-background-tertiary); overflow: hidden; }
+.goal-fill { height: 100%; background: var(--color-text-info); transition: width .3s ease; }
+.goal-fill.reached { background: var(--color-text-success); }
 
 .block { padding: 14px 18px 6px; }
 .block.bordered { border-top: 0.5px solid var(--color-border-tertiary); margin-top: 8px; padding-bottom: 16px; }
