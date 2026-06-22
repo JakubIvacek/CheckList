@@ -53,6 +53,19 @@
       <button class="signout-btn" @click="auth.signOut()">
         <i class="ti ti-logout"></i> {{ t('account.signOut') }}
       </button>
+
+      <!-- danger zone -->
+      <template v-if="!confirmDelete">
+        <button class="delete-link" @click="confirmDelete = true">{{ t('account.deleteAccount') }}</button>
+      </template>
+      <section v-else class="ac-card delete-box">
+        <p class="delete-warn">{{ t('account.deleteAccountWarn') }}</p>
+        <p v-if="deleteError" class="msg error">{{ deleteError }}</p>
+        <button class="delete-btn" :disabled="deleting" @click="doDelete">
+          {{ t('account.deleteAccountConfirm') }}
+        </button>
+        <button class="cancel-btn" @click="confirmDelete = false">{{ t('common.cancel') }}</button>
+      </section>
     </div>
 
     <!-- change password sub-view -->
@@ -217,6 +230,23 @@ async function changePassword() {
   }
 }
 
+// delete account (irreversible)
+const confirmDelete = ref(false)
+const deleting = ref(false)
+const deleteError = ref('')
+async function doDelete() {
+  deleteError.value = ''
+  deleting.value = true
+  try {
+    if (isDemo) { confirmDelete.value = false; return }
+    await auth.deleteAccount() // signs out → app shows login
+  } catch (e) {
+    deleteError.value = (e as Error).message
+  } finally {
+    deleting.value = false
+  }
+}
+
 // back arrow: from the password sub-view return to the list, otherwise leave settings
 function goBack() {
   if (view.value === 'password') { view.value = 'main'; return }
@@ -347,4 +377,19 @@ function goBack() {
   border-radius: var(--border-radius-md); padding: 12px; font-size: 15px; font-weight: 500;
 }
 .signout-btn i { font-size: 18px; }
+
+.delete-link {
+  align-self: center; margin-top: 18px;
+  background: none; border: none; cursor: pointer;
+  color: var(--color-text-tertiary); font-size: 13px; text-decoration: underline;
+}
+.delete-box { margin-top: 16px; border: 0.5px solid var(--color-text-danger); }
+.delete-warn { font-size: 13px; color: var(--color-text-secondary); line-height: 1.4; margin: 0 0 12px; }
+.delete-btn {
+  width: 100%; cursor: pointer; border: none;
+  background: var(--color-text-danger); color: #fff;
+  border-radius: var(--border-radius-md); padding: 12px; font-size: 15px; font-weight: 500;
+}
+.delete-btn:disabled { opacity: 0.5; cursor: default; }
+.delete-box .cancel-btn { margin-top: 10px; }
 </style>

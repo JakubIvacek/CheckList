@@ -31,6 +31,7 @@ Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal ap
 - **RLS** enforces isolation at the DB level: `auth.uid() = user_id`. Every request carries the JWT; only the user's own rows come back.
 - `user_id` is **never sent from the client** — it defaults to `auth.uid()` on insert, and `with check` blocks spoofing.
 - Data flow: `Vue PWA → Supabase Auth (JWT) → supabase.from('tasks') + JWT → PostgREST → RLS → Postgres → data back`.
+- **Account deletion** runs server-side via the `delete-account` Edge Function (service-role) — the browser can't delete an auth user. Deleting the auth user cascades to `tasks`/`categories` (`on delete cascade`). `auth.deleteAccount()` invokes it, then signs out. See README for deploy.
 - Offline: service worker caches the app shell so the app opens offline. Full offline-first writes (IndexedDB + sync) are explicitly deferred to a later version — do not add now.
 
 ## Data model (already created in Supabase, see README.md for SQL)

@@ -50,8 +50,17 @@ export const useAuthStore = defineStore('auth', () => {
   const signInWithGoogle = () => supabase.auth.signInWithOAuth({ provider: 'google' })
   const signOut = () => supabase.auth.signOut()
 
+  /** Permanently delete the account + all data (via the delete-account Edge
+   *  Function), then sign out. Tasks/categories cascade on the DB side. */
+  async function deleteAccount() {
+    const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' })
+    if (error) throw error
+    await supabase.auth.signOut()
+    session.value = null
+  }
+
   return {
     session, ready, recovery,
-    init, signIn, signUp, resetPassword, updatePassword, signInWithGoogle, signOut,
+    init, signIn, signUp, resetPassword, updatePassword, signInWithGoogle, signOut, deleteAccount,
   }
 })

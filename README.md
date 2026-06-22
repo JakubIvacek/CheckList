@@ -95,6 +95,22 @@ alter table tasks add column if not exists duration_min int;
 alter table tasks add column if not exists priority boolean not null default false;
 ```
 
+### Zmazanie účtu (Edge Function)
+
+Mazanie auth používateľa sa nedá z prehliadača — beží cez Edge Function
+`supabase/functions/delete-account` (service-role). Zmazanie usera **cascade**
+odstráni jeho `tasks` aj `categories` (obe majú `on delete cascade` na `auth.users`).
+
+Nasadenie (Supabase CLI, prihlásený + prepojený projekt):
+
+```bash
+supabase functions deploy delete-account
+```
+
+`SUPABASE_URL`, `SUPABASE_ANON_KEY` a `SUPABASE_SERVICE_ROLE_KEY` sa do funkcie
+injektujú automaticky — netreba ich nastavovať. Klient ju volá cez
+`supabase.functions.invoke('delete-account')` (JWT sa pošle automaticky).
+
 ## Inštalácia a spustenie
 
 ```bash
