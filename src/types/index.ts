@@ -5,6 +5,7 @@ export interface Category {
   id: string
   name: string
   color: string
+  position?: number
   created_at?: string
 }
 

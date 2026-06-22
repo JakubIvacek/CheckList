@@ -37,7 +37,7 @@ Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal ap
 ## Data model (already created in Supabase, see README.md for SQL)
 
 - `tasks`: `id, user_id, title, task_date (date), task_time (time, nullable), duration_min (int, nullable), priority (bool), repeat ('none'|'daily'|'weekly'|'monthly'), status ('todo'|'done'), category_id (nullable FK), note, position (int), created_at, completed_at`
-- `categories`: `id, user_id, name, color, created_at`
+- `categories`: `id, user_id, name, color, position (int), created_at`. `position` orders the chips/filter and the categories sheet (drag & drop reorder via `vuedraggable`); new DBs run the `position` migration in `README.md`.
 - Notes:
   - Column is `task_date`, NOT `date` (reserved word).
   - `category_id` is nullable. Categories are **active** (CRUD + colors + filter implemented).

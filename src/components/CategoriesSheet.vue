@@ -9,7 +9,15 @@
         </div>
 
         <div class="list">
-          <div v-for="c in store.categories" :key="c.id" class="cat">
+          <draggable
+            :model-value="store.categories"
+            item-key="id"
+            handle=".cat-drag"
+            :animation="150"
+            @update:model-value="store.reorderCategories"
+          >
+            <template #item="{ element: c }">
+              <div class="cat">
             <div class="cat-main">
               <div v-if="swipeId === c.id && swipeDx < 0" class="swipe-bg" :class="{ ready: swipeDx < -SWIPE_TH }">
                 <i class="ti ti-trash"></i>
@@ -22,6 +30,7 @@
                 @touchmove="onMove($event, c)"
                 @touchend="onUp($event, c)"
               >
+                <span class="cat-drag" @touchstart.stop :aria-label="t('day.reorder')"><i class="ti ti-grip-vertical"></i></span>
                 <button
                   class="swatch"
                   :style="{ background: c.color }"
@@ -56,7 +65,9 @@
                 <i class="ti ti-color-picker"></i>
               </label>
             </div>
-          </div>
+              </div>
+            </template>
+          </draggable>
 
           <div v-for="tomb in tombstones" :key="'tomb-' + tomb.cat.id" class="cat-tomb">
             <span class="tomb-icon"><i class="ti ti-trash"></i></span>
@@ -104,6 +115,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import draggable from 'vuedraggable'
 import { useCategoriesStore } from '@/stores/categories'
 import { PALETTE } from '@/lib/colors'
 import type { Category } from '@/types'
@@ -246,6 +258,12 @@ async function add() {
 }
 .cat-name:focus { outline: none; }
 .trash { border: none; background: none; color: var(--color-text-tertiary); cursor: pointer; font-size: 18px; padding: 4px; }
+.cat-drag {
+  display: flex; align-items: center; flex-shrink: 0;
+  color: var(--color-text-tertiary); font-size: 18px;
+  cursor: grab; padding: 0 2px; touch-action: none;
+}
+.cat-drag:active { cursor: grabbing; }
 .empty { color: var(--color-text-tertiary); font-size: 14px; padding: 12px 0; }
 
 .palette { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 0 4px; }

@@ -7,10 +7,10 @@ import { parseYmd, today, weekdayIndex } from '@/lib/dates'
 export const isDemo = import.meta.env.DEV && import.meta.env.VITE_DEMO !== 'false'
 
 export const DEMO_CATEGORIES: Category[] = [
-  { id: 'demo-cat-1', name: 'Thesis', color: '#007aff' },
-  { id: 'demo-cat-2', name: 'Práca', color: '#ff9500' },
-  { id: 'demo-cat-3', name: 'Gym', color: '#34c759' },
-  { id: 'demo-cat-4', name: 'Iné', color: '#af52de' },
+  { id: 'demo-cat-1', name: 'Thesis', color: '#007aff', position: 0 },
+  { id: 'demo-cat-2', name: 'Práca', color: '#ff9500', position: 1 },
+  { id: 'demo-cat-3', name: 'Gym', color: '#34c759', position: 2 },
+  { id: 'demo-cat-4', name: 'Iné', color: '#af52de', position: 3 },
 ]
 
 const TITLES = [

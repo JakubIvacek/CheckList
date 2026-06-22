@@ -41,6 +41,7 @@ create table categories (
   user_id     uuid not null references auth.users (id) on delete cascade default auth.uid(),
   name        text not null,
   color       text not null default '#8E8E93',
+  position    int not null default 0,
   created_at  timestamptz not null default now()
 );
 
@@ -96,6 +97,19 @@ alter table tasks add column if not exists duration_min int;
 alter table tasks add column if not exists priority boolean not null default false;
 alter table tasks add column if not exists repeat text not null default 'none'
   check (repeat in ('none','daily','weekly','monthly'));
+```
+
+### Migrácia pre existujúcu DB (poradie kategórií)
+
+```sql
+alter table categories add column if not exists position int not null default 0;
+
+-- backfill podľa created_at
+with ordered as (
+  select id, row_number() over (partition by user_id order by created_at) - 1 as rn
+  from categories
+)
+update categories c set position = o.rn from ordered o where o.id = c.id;
 ```
 
 ### Zmazanie účtu (Edge Function)

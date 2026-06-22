@@ -5,13 +5,11 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 ## Roadmap (poradie implementácie)
 
 1. [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres (localStorage, bez DB).
-2. [ ] **Filter „len hotové" / archív** (S) — prepínač zobraziť len dokončené.
 
 Potom (nižšia priorita):
 
-3. [ ] **Preradenie poradia kategórií** (S) — `categories.position` + drag (potrebuje migráciu).
-4. [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
-5. [ ] **Filter podľa viacerých kategórií naraz** (S).
+2. [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
+3. [ ] **Filter podľa viacerých kategórií naraz** (S).
 
 ## Polish (leštenie pred „launchom")
 - [ ] **Jemné animácie** (S) — rozšíriť o plynulý expand úlohy (edit form sa roztvorí, nie skok) + prechod do Settings (fade/slide route transition); jednotných 150–200 ms. (Základ — checkbox pop, prečiarknutie, press, „Späť" riadok — už hotový.)
@@ -40,6 +38,7 @@ Potom (nižšia priorita):
 ---
 
 ## Hotovo
+- [x] Preradenie poradia kategórií — drag (`⋮⋮` handle) v Categories sheet cez `vuedraggable`; `categories.position` stĺpec, premieta sa do filter-chipov. (migrácia v README)
 - [x] Export / Import JSON — Settings → DATA: export všetkých úloh+kategórií do `stride-backup-<dátum>.json`; import (nedeštruktívny, pridáva) s premapovaním category_id. (`src/lib/backup.ts`)
 - [x] Overdue úlohy — zbaliteľná sekcia „Po termíne (N)" hore na Domove (len aktuálny týždeň); checkbox/swipe → hotovo, „Today" → presun na dnes, ✕/swipe → zmazať; inline „Späť" pri zmazaní aj dokončení. Store `overdue` + `fetchOverdue` (všetko nedokončené v minulosti).
 - [x] Opakujúce sa úlohy (jednoduché) — `repeat` None/Daily/Weekly/Monthly (ikona-select vedľa kategórií); pri *hotovo* sa spawne ďalší výskyt (+1d/+7d/+1m), repeat sa na dokončenom zmaže (žiadne duplikáty/série). 🔁 indikátor v riadku.

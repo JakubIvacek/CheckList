@@ -26,24 +26,39 @@ export const useCategoriesStore = defineStore('categories', () => {
       return
     }
     const { data, error } = await supabase
-      .from('categories').select('id, name, color, created_at')
+      .from('categories').select('id, name, color, position, created_at')
+      .order('position', { ascending: true })
       .order('created_at', { ascending: true })
     if (error) throw error
     categories.value = data ?? []
     loaded.value = true
   }
 
+  const nextPosition = () =>
+    categories.value.length ? Math.max(...categories.value.map(c => c.position ?? 0)) + 1 : 0
+
   async function addCategory(name: string, color: string): Promise<Category> {
+    const position = nextPosition()
     if (isDemo) {
-      const cat: Category = { id: `demo-cat-${crypto.randomUUID()}`, name, color }
+      const cat: Category = { id: `demo-cat-${crypto.randomUUID()}`, name, color, position }
       categories.value.push(cat)
       return cat
     }
     const { data, error } = await supabase
-      .from('categories').insert({ name, color }).select().single()
+      .from('categories').insert({ name, color, position }).select().single()
     if (error) throw error
     categories.value.push(data)
     return data
+  }
+
+  // persist a new order (drag & drop in the categories sheet)
+  async function reorderCategories(ordered: Category[]) {
+    categories.value = ordered
+    ordered.forEach((c, i) => { c.position = i })
+    if (!isDemo) {
+      await Promise.all(ordered.map((c, i) =>
+        supabase.from('categories').update({ position: i }).eq('id', c.id)))
+    }
   }
 
   async function updateCategory(id: string, updates: Partial<Pick<Category, 'name' | 'color'>>) {
@@ -92,5 +107,5 @@ export const useCategoriesStore = defineStore('categories', () => {
     }
   }
 
-  return { categories, loaded, byId, color, fetchAll, addCategory, updateCategory, deleteCategory, restoreCategory }
+  return { categories, loaded, byId, color, fetchAll, addCategory, updateCategory, deleteCategory, restoreCategory, reorderCategories }
 })
