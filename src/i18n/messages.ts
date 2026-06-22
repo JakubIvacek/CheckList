@@ -2,6 +2,7 @@ export const messages = {
   en: {
     common: { delete: 'Delete', cancel: 'Cancel', confirmDelete: 'Delete?' },
     undo: { action: 'Undo' },
+    overdue: { title: 'Overdue', toToday: 'Today' },
     empty: {
       noTasksCategory: 'No tasks in this category this week.',
       noStats: 'No completed tasks yet — finish a few to see your stats.',
@@ -149,6 +150,7 @@ export const messages = {
   sk: {
     common: { delete: 'Zmazať', cancel: 'Zrušiť', confirmDelete: 'Zmazať?' },
     undo: { action: 'Späť' },
+    overdue: { title: 'Po termíne', toToday: 'Dnes' },
     empty: {
       noTasksCategory: 'Žiadne úlohy v tejto kategórii tento týždeň.',
       noStats: 'Zatiaľ žiadne dokončené úlohy — dokonči pár a uvidíš štatistiky.',
@@ -296,6 +298,7 @@ export const messages = {
   de: {
     common: { delete: 'Löschen', cancel: 'Abbrechen', confirmDelete: 'Löschen?' },
     undo: { action: 'Rückgängig' },
+    overdue: { title: 'Überfällig', toToday: 'Heute' },
     empty: {
       noTasksCategory: 'Keine Aufgaben in dieser Kategorie diese Woche.',
       noStats: 'Noch keine erledigten Aufgaben — erledige ein paar, um Statistiken zu sehen.',
@@ -362,6 +365,7 @@ export const messages = {
   es: {
     common: { delete: 'Eliminar', cancel: 'Cancelar', confirmDelete: '¿Eliminar?' },
     undo: { action: 'Deshacer' },
+    overdue: { title: 'Atrasadas', toToday: 'Hoy' },
     empty: {
       noTasksCategory: 'No hay tareas en esta categoría esta semana.',
       noStats: 'Aún no hay tareas completadas — completa algunas para ver tus estadísticas.',
@@ -428,6 +432,7 @@ export const messages = {
   fr: {
     common: { delete: 'Supprimer', cancel: 'Annuler', confirmDelete: 'Supprimer ?' },
     undo: { action: 'Annuler' },
+    overdue: { title: 'En retard', toToday: "Aujourd'hui" },
     empty: {
       noTasksCategory: 'Aucune tâche dans cette catégorie cette semaine.',
       noStats: 'Aucune tâche terminée pour l’instant — terminez-en quelques-unes pour voir vos statistiques.',
@@ -494,6 +499,7 @@ export const messages = {
   it: {
     common: { delete: 'Elimina', cancel: 'Annulla', confirmDelete: 'Eliminare?' },
     undo: { action: 'Annulla' },
+    overdue: { title: 'In ritardo', toToday: 'Oggi' },
     empty: {
       noTasksCategory: 'Nessuna attività in questa categoria questa settimana.',
       noStats: 'Ancora nessuna attività completata — completane alcune per vedere le statistiche.',
@@ -560,6 +566,7 @@ export const messages = {
   pt: {
     common: { delete: 'Eliminar', cancel: 'Cancelar', confirmDelete: 'Eliminar?' },
     undo: { action: 'Anular' },
+    overdue: { title: 'Em atraso', toToday: 'Hoje' },
     empty: {
       noTasksCategory: 'Sem tarefas nesta categoria esta semana.',
       noStats: 'Ainda sem tarefas concluídas — conclui algumas para ver as estatísticas.',

@@ -68,6 +68,9 @@
       <button class="manage" @click="catSheet = true" :aria-label="t('cat.manage')"><i class="ti ti-adjustments-horizontal"></i></button>
     </section>
 
+    <!-- overdue (incomplete past tasks), only while viewing the current week -->
+    <OverdueSection v-if="isThisWeek" />
+
     <!-- empty state when a category filter matches nothing this week -->
     <div v-if="selectedCat !== null && totalCount === 0" class="empty-state">
       <i class="ti ti-mood-empty"></i>
@@ -115,6 +118,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DayList from '@/components/DayList.vue'
+import OverdueSection from '@/components/OverdueSection.vue'
 import CategoriesSheet from '@/components/CategoriesSheet.vue'
 import { useTasksStore } from '@/stores/tasks'
 import { useCategoriesStore } from '@/stores/categories'
@@ -130,6 +134,7 @@ const categoriesStore = useCategoriesStore()
 const monday = ref(getMonday(new Date()))
 const expanded = ref<Set<string>>(new Set())
 const selectedCat = ref<string | null>(null)
+const isThisWeek = computed(() => monday.value === getMonday(today()))
 const catSheet = ref(false)
 const dayRefs = new Map<string, InstanceType<typeof DayList>>()
 
@@ -202,6 +207,7 @@ function quickAdd() {
 async function load() {
   expanded.value = new Set()
   await tasksStore.fetchRange(monday.value, addDays(monday.value, 6))
+  if (isThisWeek.value) tasksStore.fetchOverdue()
 }
 
 function shiftWeek(dir: number) {

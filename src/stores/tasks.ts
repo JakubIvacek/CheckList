@@ -2,11 +2,12 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { demoTasksForRange, isDemo } from '@/lib/demo'
-import { nextRepeatDate } from '@/lib/dates'
+import { addDays, nextRepeatDate, today } from '@/lib/dates'
 import type { Task, TaskRepeat, TaskStatus } from '@/types'
 
 export const useTasksStore = defineStore('tasks', () => {
   const tasks = ref<Task[]>([])
+  const overdue = ref<Task[]>([]) // incomplete tasks from before today (any week)
   const loading = ref(false)
 
   // next free position within a day (append to the end), based on loaded tasks
@@ -33,6 +34,48 @@ export const useTasksStore = defineStore('tasks', () => {
     } finally {
       loading.value = false
     }
+  }
+
+  // all incomplete tasks dated before today (independent of the loaded week)
+  async function fetchOverdue() {
+    const t = today()
+    if (isDemo) {
+      overdue.value = demoTasksForRange(addDays(t, -60), addDays(t, -1)).filter(x => x.status === 'todo')
+      return
+    }
+    const { data, error } = await supabase
+      .from('tasks').select('*')
+      .eq('status', 'todo').lt('task_date', t)
+      .order('task_date', { ascending: true })
+    if (error) throw error
+    overdue.value = data ?? []
+  }
+
+  // re-insert a deleted overdue task back into the overdue list (for undo)
+  async function restoreOverdue(task: Task) {
+    if (isDemo) {
+      overdue.value.push({ ...task })
+    } else {
+      const { id: _id, ...fields } = task
+      const { data, error } = await supabase.from('tasks').insert(fields).select().single()
+      if (error) throw error
+      overdue.value.push(data)
+    }
+    overdue.value.sort((a, b) => a.task_date.localeCompare(b.task_date))
+  }
+
+  // move an overdue task to today (resolves it out of the overdue list)
+  async function moveToToday(task: Task) {
+    const date = today()
+    const position = nextPosition(date)
+    if (!isDemo) {
+      const { error } = await supabase.from('tasks').update({ task_date: date, position }).eq('id', task.id)
+      if (error) throw error
+    }
+    overdue.value = overdue.value.filter(t => t.id !== task.id)
+    task.task_date = date
+    task.position = position
+    if (!tasks.value.some(t => t.id === task.id)) tasks.value.push(task)
   }
 
   async function addTask(
@@ -97,6 +140,8 @@ export const useTasksStore = defineStore('tasks', () => {
     }
     if (spawn) await spawnNextOccurrence(task)
     Object.assign(task, updates)
+    // a completed task is no longer overdue
+    if (next === 'done') overdue.value = overdue.value.filter(t => t.id !== task.id)
   }
 
   async function deleteTask(id: string) {
@@ -105,6 +150,7 @@ export const useTasksStore = defineStore('tasks', () => {
       if (error) throw error
     }
     tasks.value = tasks.value.filter(t => t.id !== id)
+    overdue.value = overdue.value.filter(t => t.id !== id)
   }
 
   // Re-insert a previously deleted task (for undo). Keeps its day/position/state;
@@ -153,5 +199,9 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
-  return { tasks, loading, fetchRange, addTask, toggleTask, deleteTask, restoreTask, updateTask, reorderTasks }
+  return {
+    tasks, overdue, loading,
+    fetchRange, fetchOverdue, moveToToday, restoreOverdue,
+    addTask, toggleTask, deleteTask, restoreTask, updateTask, reorderTasks,
+  }
 })
