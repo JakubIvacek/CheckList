@@ -2,7 +2,8 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { supabase } from '@/lib/supabase'
 import { demoTasksForRange, isDemo } from '@/lib/demo'
-import type { Task, TaskStatus } from '@/types'
+import { nextRepeatDate } from '@/lib/dates'
+import type { Task, TaskRepeat, TaskStatus } from '@/types'
 
 export const useTasksStore = defineStore('tasks', () => {
   const tasks = ref<Task[]>([])
@@ -41,19 +42,42 @@ export const useTasksStore = defineStore('tasks', () => {
     task_time: string | null = null,
     duration_min: number | null = null,
     note: string | null = null,
+    repeat: TaskRepeat = 'none',
   ) {
     const position = nextPosition(task_date)
     if (isDemo) {
       tasks.value.push({
         id: `demo-${crypto.randomUUID()}`,
-        title, task_date, task_time, duration_min, priority: false, status: 'todo',
+        title, task_date, task_time, duration_min, priority: false, repeat, status: 'todo',
         category_id, note, position,
         created_at: new Date().toISOString(), completed_at: null,
       })
       return
     }
     const { data, error } = await supabase
-      .from('tasks').insert({ title, task_date, task_time, duration_min, category_id, note, position }).select().single()
+      .from('tasks').insert({ title, task_date, task_time, duration_min, category_id, note, repeat, position }).select().single()
+    if (error) throw error
+    tasks.value.push(data)
+  }
+
+  // Insert the next occurrence of a recurring task on its next date (carries
+  // over time/duration/category/note/priority/repeat). Demo pushes locally.
+  async function spawnNextOccurrence(task: Task) {
+    if (task.repeat === 'none') return
+    const task_date = nextRepeatDate(task.task_date, task.repeat)
+    const fields = {
+      title: task.title, task_date, task_time: task.task_time, duration_min: task.duration_min,
+      category_id: task.category_id, note: task.note, priority: task.priority, repeat: task.repeat,
+      position: nextPosition(task_date),
+    }
+    if (isDemo) {
+      tasks.value.push({
+        ...fields, id: `demo-${crypto.randomUUID()}`, status: 'todo',
+        created_at: new Date().toISOString(), completed_at: null,
+      })
+      return
+    }
+    const { data, error } = await supabase.from('tasks').insert(fields).select().single()
     if (error) throw error
     tasks.value.push(data)
   }
@@ -61,13 +85,18 @@ export const useTasksStore = defineStore('tasks', () => {
   async function toggleTask(task: Task) {
     const next: TaskStatus = task.status === 'done' ? 'todo' : 'done'
     const completed_at = next === 'done' ? new Date().toISOString() : null
+    // completing a recurring task spawns the next occurrence and clears repeat
+    // on this one, so re-toggling never spawns a duplicate
+    const spawn = next === 'done' && task.repeat !== 'none'
+    const updates = spawn
+      ? { status: next, completed_at, repeat: 'none' as TaskRepeat }
+      : { status: next, completed_at }
     if (!isDemo) {
-      const { error } = await supabase
-        .from('tasks').update({ status: next, completed_at }).eq('id', task.id)
+      const { error } = await supabase.from('tasks').update(updates).eq('id', task.id)
       if (error) throw error
     }
-    task.status = next
-    task.completed_at = completed_at
+    if (spawn) await spawnNextOccurrence(task)
+    Object.assign(task, updates)
   }
 
   async function deleteTask(id: string) {

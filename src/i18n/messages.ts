@@ -35,6 +35,11 @@ export const messages = {
       to: 'To',
       duration: 'Duration',
       priority: 'Flag as important',
+      repeat: 'Repeat',
+      repeatNone: 'No repeat',
+      repeatDaily: 'Daily',
+      repeatWeekly: 'Weekly',
+      repeatMonthly: 'Monthly',
     },
     cat: {
       none: 'None',
@@ -177,6 +182,11 @@ export const messages = {
       to: 'Do',
       duration: 'Trvanie',
       priority: 'Označiť ako dôležité',
+      repeat: 'Opakovať',
+      repeatNone: 'Neopakovať',
+      repeatDaily: 'Denne',
+      repeatWeekly: 'Týždenne',
+      repeatMonthly: 'Mesačne',
     },
     cat: {
       none: 'Žiadna',
@@ -300,6 +310,7 @@ export const messages = {
       today: 'heute', addItem: 'Aufgabe hinzufügen', itemName: 'Aufgabenname', deleteItem: 'Aufgabe löschen',
       markDone: 'Als erledigt markieren', markUndone: 'Als offen markieren', moveTo: 'Verschieben auf',
       reorder: 'Sortieren', note: 'Notiz (optional)', time: 'Uhrzeit (optional)', timeShort: 'Uhrzeit', from: 'Von', to: 'Bis', duration: 'Dauer', priority: 'Als wichtig markieren',
+      repeat: 'Wiederholen', repeatNone: 'Nicht wiederholen', repeatDaily: 'Täglich', repeatWeekly: 'Wöchentlich', repeatMonthly: 'Monatlich',
     },
     cat: {
       none: 'Keine', new: 'Neu', name: 'Kategoriename', title: 'Kategorien', newCategory: 'Neue Kategorie',
@@ -365,6 +376,7 @@ export const messages = {
       today: 'hoy', addItem: 'Añadir tarea', itemName: 'Nombre de la tarea', deleteItem: 'Eliminar tarea',
       markDone: 'Marcar como hecha', markUndone: 'Marcar como pendiente', moveTo: 'Mover a',
       reorder: 'Reordenar', note: 'Nota (opcional)', time: 'Hora (opcional)', timeShort: 'Hora', from: 'Desde', to: 'Hasta', duration: 'Duración', priority: 'Marcar como importante',
+      repeat: 'Repetir', repeatNone: 'No repetir', repeatDaily: 'Diario', repeatWeekly: 'Semanal', repeatMonthly: 'Mensual',
     },
     cat: {
       none: 'Ninguna', new: 'Nueva', name: 'Nombre de categoría', title: 'Categorías', newCategory: 'Nueva categoría',
@@ -430,6 +442,7 @@ export const messages = {
       today: 'aujourd’hui', addItem: 'Ajouter une tâche', itemName: 'Nom de la tâche', deleteItem: 'Supprimer la tâche',
       markDone: 'Marquer comme faite', markUndone: 'Marquer comme à faire', moveTo: 'Déplacer au',
       reorder: 'Réordonner', note: 'Note (facultatif)', time: 'Heure (facultatif)', timeShort: 'Heure', from: 'De', to: 'À', duration: 'Durée', priority: 'Marquer comme important',
+      repeat: 'Répéter', repeatNone: 'Ne pas répéter', repeatDaily: 'Quotidien', repeatWeekly: 'Hebdomadaire', repeatMonthly: 'Mensuel',
     },
     cat: {
       none: 'Aucune', new: 'Nouvelle', name: 'Nom de catégorie', title: 'Catégories', newCategory: 'Nouvelle catégorie',
@@ -495,6 +508,7 @@ export const messages = {
       today: 'oggi', addItem: 'Aggiungi attività', itemName: 'Nome attività', deleteItem: 'Elimina attività',
       markDone: 'Segna come fatta', markUndone: 'Segna come da fare', moveTo: 'Sposta al',
       reorder: 'Riordina', note: 'Nota (facoltativa)', time: 'Ora (facoltativa)', timeShort: 'Ora', from: 'Dalle', to: 'Alle', duration: 'Durata', priority: 'Segna come importante',
+      repeat: 'Ripeti', repeatNone: 'Non ripetere', repeatDaily: 'Ogni giorno', repeatWeekly: 'Ogni settimana', repeatMonthly: 'Ogni mese',
     },
     cat: {
       none: 'Nessuna', new: 'Nuova', name: 'Nome categoria', title: 'Categorie', newCategory: 'Nuova categoria',
@@ -560,6 +574,7 @@ export const messages = {
       today: 'hoje', addItem: 'Adicionar tarefa', itemName: 'Nome da tarefa', deleteItem: 'Eliminar tarefa',
       markDone: 'Marcar como feita', markUndone: 'Marcar como pendente', moveTo: 'Mover para',
       reorder: 'Reordenar', note: 'Nota (opcional)', time: 'Hora (opcional)', timeShort: 'Hora', from: 'De', to: 'Até', duration: 'Duração', priority: 'Marcar como importante',
+      repeat: 'Repetir', repeatNone: 'Não repetir', repeatDaily: 'Diário', repeatWeekly: 'Semanal', repeatMonthly: 'Mensal',
     },
     cat: {
       none: 'Nenhuma', new: 'Nova', name: 'Nome da categoria', title: 'Categorias', newCategory: 'Nova categoria',

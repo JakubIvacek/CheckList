@@ -31,7 +31,18 @@
               rows="2"
               :placeholder="t('day.note')"
             ></textarea>
-            <CategoryPicker v-model="editCat" />
+            <div class="cat-repeat-row">
+              <CategoryPicker v-model="editCat" />
+              <label class="repeat-icon" :class="{ on: editRepeat !== 'none' }" :aria-label="t('day.repeat')">
+                <i class="ti ti-repeat"></i>
+                <select v-model="editRepeat">
+                  <option value="none">{{ t('day.repeatNone') }}</option>
+                  <option value="daily">{{ t('day.repeatDaily') }}</option>
+                  <option value="weekly">{{ t('day.repeatWeekly') }}</option>
+                  <option value="monthly">{{ t('day.repeatMonthly') }}</option>
+                </select>
+              </label>
+            </div>
             <div class="edit-bottom">
               <template v-if="moveOpen">
                 <span class="eb-q">{{ t('day.moveTo') }}</span>
@@ -120,6 +131,7 @@
                 class="cat-dot"
                 :style="{ background: catColor(task.category_id)! }"
               ></span>
+              <i v-if="task.repeat !== 'none'" class="ti ti-repeat row-repeat" :class="{ done: task.status === 'done' }"></i>
               <button
                 type="button"
                 class="flag-dot"
@@ -185,7 +197,18 @@
             </select>
           </div>
         </div>
-        <CategoryPicker v-model="selectedCat" />
+        <div class="cat-repeat-row">
+          <CategoryPicker v-model="selectedCat" />
+          <label class="repeat-icon" :class="{ on: newRepeat !== 'none' }" :aria-label="t('day.repeat')">
+            <i class="ti ti-repeat"></i>
+            <select v-model="newRepeat">
+              <option value="none">{{ t('day.repeatNone') }}</option>
+              <option value="daily">{{ t('day.repeatDaily') }}</option>
+              <option value="weekly">{{ t('day.repeatWeekly') }}</option>
+              <option value="monthly">{{ t('day.repeatMonthly') }}</option>
+            </select>
+          </label>
+        </div>
       </div>
       <button v-else type="button" class="trow trow-add" @click="openAdd">
         <span class="check dashed"><i class="ti ti-plus"></i></span>
@@ -203,7 +226,7 @@ import { useCategoriesStore } from '@/stores/categories'
 import CategoryPicker from '@/components/CategoryPicker.vue'
 import { useFmt } from '@/i18n/dates'
 import { today } from '@/lib/dates'
-import type { Task } from '@/types'
+import type { Task, TaskRepeat } from '@/types'
 
 const { t } = useI18n()
 const fmt = useFmt()
@@ -241,6 +264,7 @@ const newHour = ref('')
 const newMin = ref('')
 const newEndHour = ref('')
 const newEndMin = ref('')
+const newRepeat = ref<TaskRepeat>('none')
 const selectedCat = ref<string | null>(null)
 const inputEl = ref<HTMLInputElement | null>(null)
 
@@ -253,6 +277,7 @@ const editHour = ref('')
 const editMin = ref('')
 const editEndHour = ref('')
 const editEndMin = ref('')
+const editRepeat = ref<TaskRepeat>('none')
 
 // Minute mirrors the hour: no hour → '--', picking an hour defaults minute to '00'.
 watch(newHour, h => { newMin.value = h ? (newMin.value || '00') : '' })
@@ -297,6 +322,7 @@ async function openEdit(task: Task) {
     editEndHour.value = ''
     editEndMin.value = ''
   }
+  editRepeat.value = task.repeat ?? 'none'
   moveOpen.value = false
   await nextTick()
   const el = Array.isArray(editEl.value) ? editEl.value[0] : editEl.value
@@ -311,6 +337,7 @@ async function saveEdit(task: Task) {
     title, category_id: editCat.value, note: editNote.value.trim() || null,
     task_time: start,
     duration_min: durFrom(start, editEndHour.value, editEndMin.value),
+    repeat: editRepeat.value,
   })
   editingId.value = null
 }
@@ -418,6 +445,7 @@ async function submit() {
     start,
     durFrom(start, newEndHour.value, newEndMin.value),
     newNote.value.trim() || null,
+    newRepeat.value,
   )
   newTitle.value = ''
   newNote.value = ''
@@ -425,6 +453,7 @@ async function submit() {
   newMin.value = ''
   newEndHour.value = ''
   newEndMin.value = ''
+  newRepeat.value = 'none'
   selectedCat.value = null
   adding.value = false
 }
@@ -436,6 +465,7 @@ function cancel() {
   newMin.value = ''
   newEndHour.value = ''
   newEndMin.value = ''
+  newRepeat.value = 'none'
   adding.value = false
 }
 
@@ -536,6 +566,20 @@ defineExpose({ openAdd })
   display: flex; align-items: center; font-size: 16px; color: var(--color-text-tertiary);
 }
 .flag-dot.on { color: var(--color-text-info); }
+.row-repeat { font-size: 14px; color: var(--color-text-info); flex-shrink: 0; }
+.row-repeat.done { opacity: 0.5; }
+
+.cat-repeat-row { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.cat-repeat-row > :first-child { flex: 1; min-width: 0; }
+.repeat-icon {
+  position: relative; flex-shrink: 0;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 0.5px solid var(--color-border-tertiary);
+  color: var(--color-text-tertiary); font-size: 15px; cursor: pointer;
+}
+.repeat-icon.on { color: var(--color-text-info); background: var(--color-background-info); border-color: transparent; }
+.repeat-icon select { position: absolute; inset: 0; opacity: 0; cursor: pointer; border: none; }
 .row-text.muted { font-size: 14px; color: var(--color-text-tertiary); }
 .trow-add { background: none; border: none; width: 100%; text-align: left; }
 

@@ -37,6 +37,17 @@ export function addDays(s: string, n: number): string {
   return ymd(d)
 }
 
+/** Next occurrence date for a recurring task (daily +1d, weekly +7d,
+ *  monthly = same day next month, clamped to the month's last day). */
+export function nextRepeatDate(s: string, repeat: 'daily' | 'weekly' | 'monthly'): string {
+  if (repeat === 'daily') return addDays(s, 1)
+  if (repeat === 'weekly') return addDays(s, 7)
+  const d = parseYmd(s)
+  const y = d.getFullYear(), m = d.getMonth()
+  const lastDay = new Date(y, m + 2, 0).getDate()
+  return ymd(new Date(y, m + 1, Math.min(d.getDate(), lastDay)))
+}
+
 /** Monday (as 'YYYY-MM-DD') of the week containing `date`. */
 export function getMonday(date: Date | string): string {
   const d = typeof date === 'string' ? parseYmd(date) : new Date(date)

@@ -36,7 +36,7 @@ Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal ap
 
 ## Data model (already created in Supabase, see README.md for SQL)
 
-- `tasks`: `id, user_id, title, task_date (date), task_time (time, nullable), duration_min (int, nullable), priority (bool), status ('todo'|'done'), category_id (nullable FK), note, position (int), created_at, completed_at`
+- `tasks`: `id, user_id, title, task_date (date), task_time (time, nullable), duration_min (int, nullable), priority (bool), repeat ('none'|'daily'|'weekly'|'monthly'), status ('todo'|'done'), category_id (nullable FK), note, position (int), created_at, completed_at`
 - `categories`: `id, user_id, name, color, created_at`
 - Notes:
   - Column is `task_date`, NOT `date` (reserved word).
@@ -45,6 +45,7 @@ Weekly task-management PWA. Apple-clean, mobile-first, cloud-synced. Personal ap
   - `task_time` is the optional **start** time of day ('HH:MM'). Within a day, timed tasks sort first ascending by time, untimed tasks keep `position` order below them (`src/lib/sortTasks.ts` `byDayOrder`, used by Home + Calendar day detail). Nullable; run the `task_time` migration in `README.md` on existing DBs.
   - `duration_min` stores the **end** time as minutes after the start (the edit/add form has "From"/"To" hour:minute selects; `DayList.vue` saves `duration_min = end − start` when both are set, only if end > start). It is meaningless without `task_time`. The row renders the range, e.g. `14:00–15:30` (start + duration), or just `14:00` when no end. Nullable; same migration block in `README.md`.
   - `priority` is a boolean "important" flag, toggled directly on the row via the flag icon in `DayList.vue` (grey = off, brand-red filled = on). Default false; same migration block in `README.md`.
+  - `repeat` is recurrence (`none|daily|weekly|monthly`), set via the repeat-icon select in the edit/add form. **Spawn-on-complete model:** when a task with `repeat≠none` is toggled **done**, the store (`toggleTask` → `spawnNextOccurrence`) inserts the next occurrence (`src/lib/dates.ts` `nextRepeatDate`: +1d/+7d/+1 month clamped) carrying time/duration/category/note/priority/repeat, and **clears `repeat` on the completed one** so re-toggling never spawns a duplicate. No series_id / occurrence editing — deliberately simple. Row shows a 🔁 (`ti-repeat`) indicator. Default `'none'`; same migration block in `README.md`.
   - `completed_at` is set **app-side** on toggle (store sets `new Date().toISOString()` when status → done, `null` when → todo). No DB trigger.
   - Weeks are NOT stored. Group by ISO week over `task_date`; charts aggregate over the same column. Index `(user_id, task_date)` covers week/month range queries.
 

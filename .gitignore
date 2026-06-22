@@ -7,6 +7,7 @@ dist
 *.log
 *.tsbuildinfo
 .vite
+supabase/.temp
 sw.js
 workbox-*.js
 precache-manifest.*.js

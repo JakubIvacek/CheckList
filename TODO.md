@@ -4,19 +4,17 @@ Nápady a vylepšenia na premyslenie. Legenda námahy: **S** = malé, **M** = st
 
 ## Roadmap (poradie implementácie)
 
-1. [ ] **Opakujúce sa úlohy — jednoduché** (M) — pole `repeat` na úlohe: **None / Daily / Weekly / Monthly**. Pri označení úlohy ako **hotovej** sa automaticky vytvorí nový task o interval ďalej (+1 deň / +7 dní / +1 mesiac). DB = **jeden stĺpec `repeat`**, nič viac.
-   - ⛔ ZÁMERNE NEROBIŤ: `series_id`, generovanie výskytov dopredu, „zmazať tento výskyt / celú sériu", „upraviť tento / všetky". To je kalendárová nočná mora — držať sa „spawn next on complete".
-2. [ ] **Overdue úlohy** (M) — sekcia hore na Domove „Overdue (N)" s nedokončenými úlohami spred dneška + akcie (hotovo / posunúť na dnes / zmazať). Treba ťahať nedokončené aj mimo aktuálneho týždňa.
-3. [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres (localStorage, bez DB).
-4. [ ] **Export JSON** (S) — stiahnuť zálohu úloh (a kategórií) do JSON.
-5. [ ] **Filter „len hotové" / archív** (S) — prepínač zobraziť len dokončené.
+1. [ ] **Overdue úlohy** (M) — sekcia hore na Domove „Overdue (N)" s nedokončenými úlohami spred dneška + akcie (hotovo / posunúť na dnes / zmazať). Treba ťahať nedokončené aj mimo aktuálneho týždňa.
+2. [ ] **Týždenný cieľ** (S) — cieľ X úloh/týždeň + progres (localStorage, bez DB).
+3. [ ] **Export JSON** (S) — stiahnuť zálohu úloh (a kategórií) do JSON.
+4. [ ] **Filter „len hotové" / archív** (S) — prepínač zobraziť len dokončené.
 
 Potom (nižšia priorita):
 
-6. [ ] **Preradenie poradia kategórií** (S) — `categories.position` + drag (potrebuje migráciu).
-7. [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
-8. [ ] **Filter podľa viacerých kategórií naraz** (S).
-9. [ ] **Import JSON** (S–M) — obnova zo zálohy.
+5. [ ] **Preradenie poradia kategórií** (S) — `categories.position` + drag (potrebuje migráciu).
+6. [ ] **Haptika** (S) — vibrácia pri akcii (Android cez Vibration API; iOS Safari nepodporuje).
+7. [ ] **Filter podľa viacerých kategórií naraz** (S).
+8. [ ] **Import JSON** (S–M) — obnova zo zálohy.
 
 ## Polish (leštenie pred „launchom")
 - [ ] **Jemné animácie** (S) — rozšíriť o plynulý expand úlohy (edit form sa roztvorí, nie skok) + prechod do Settings (fade/slide route transition); jednotných 150–200 ms. (Základ — checkbox pop, prečiarknutie, press, „Späť" riadok — už hotový.)
@@ -45,6 +43,7 @@ Potom (nižšia priorita):
 ---
 
 ## Hotovo
+- [x] Opakujúce sa úlohy (jednoduché) — `repeat` None/Daily/Weekly/Monthly (ikona-select vedľa kategórií); pri *hotovo* sa spawne ďalší výskyt (+1d/+7d/+1m), repeat sa na dokončenom zmaže (žiadne duplikáty/série). 🔁 indikátor v riadku.
 - [x] Zmazať účet + dáta — „Delete account" v Settings (dvojkrokové potvrdenie) → `delete-account` Edge Function (service-role) zmaže auth usera, dáta odídu cascade. *(treba nasadiť funkciu: `supabase functions deploy delete-account`)*
 - [x] Animácie — checkbox pop + plynulé vyfarbenie, animované prečiarknutie textu, press efekt na tlačidlách, vsunutie „Späť" riadku; pod `prefers-reduced-motion`.
 - [x] Trend completion % v čase — prepínač Počet ↔ % v hlavičke grafu (rovnaké obdobia), hodnoty nad stĺpcami.

@@ -65,6 +65,8 @@ function tasksForDate(dateStr: string, todayStr: string): Task[] {
     const duration_min = task_time && dh % 2 === 0 ? DURS[(dh >> 4) % DURS.length] : null
     // ~1 of every 5 tasks is flagged as important
     const priority = hash(dateStr + ':pri:' + i) % 5 === 0
+    // ~1 of every 6 tasks repeats weekly (for showcase)
+    const repeat: Task['repeat'] = hash(dateStr + ':rep:' + i) % 6 === 0 ? 'weekly' : 'none'
     out.push({
       id: `demo-${dateStr}-${i}`,
       title: TITLES[(hi >>> 2) % TITLES.length],
@@ -72,6 +74,7 @@ function tasksForDate(dateStr: string, todayStr: string): Task[] {
       task_time,
       duration_min,
       priority,
+      repeat,
       status,
       category_id,
       note: hi % 4 === 0 ? NOTES[(hi >>> 5) % NOTES.length] : null,
