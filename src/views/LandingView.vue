@@ -25,7 +25,7 @@
           <span class="lp-note">Free · no credit card needed</span>
         </div>
         <div class="lp-hero-shot">
-          <div class="lp-frame tall"><span class="lp-frame-label">Stride · this week</span></div>
+          <div class="lp-frame tall"><img src="/screens/Home.png" alt="Stride — this week"></div>
         </div>
       </div>
     </section>
@@ -59,7 +59,7 @@
         <h2 class="center">A simple view for every part of your week.</h2>
         <div class="lp-cards3">
           <div v-for="v in views" :key="v.title" class="lp-view">
-            <div class="lp-frame"><span class="lp-frame-label">{{ v.title }}</span></div>
+            <div class="lp-frame"><img :src="v.img" :alt="v.title"></div>
             <h3>{{ v.title }}</h3>
             <p>{{ v.text }}</p>
           </div>
@@ -131,9 +131,9 @@ const features = [
   { icon: 'ti-chart-bar', title: 'Progress tracking', text: 'Streaks, completion and a weekly goal keep you on track.' },
 ]
 const views = [
-  { title: 'Home', text: 'Your week at a glance, day by day.' },
-  { title: 'Calendar', text: 'Month and year views to plan ahead.' },
-  { title: 'Statistics', text: 'Streaks, goals and your activity over time.' },
+  { img: '/screens/Home.png', title: 'Home', text: 'Your week at a glance, day by day.' },
+  { img: '/screens/Calendar.png', title: 'Calendar', text: 'Month and year views to plan ahead.' },
+  { img: '/screens/Stats_Month.png', title: 'Statistics', text: 'Streaks, goals and your activity over time.' },
 ]
 const devices = [
   { icon: 'ti-world', title: 'Web app', text: 'Works in any browser.' },
@@ -186,13 +186,13 @@ const roadmapSoon = ['iOS App', 'Android App', 'Push Notifications']
 .lp-hero-shot { display: flex; justify-content: center; }
 
 .lp-frame {
-  width: 100%; aspect-ratio: 16 / 10; border-radius: 16px;
-  background: linear-gradient(160deg, #1b1b21, #121216);
+  width: 100%; aspect-ratio: 393 / 855; border-radius: 22px;
+  background: #121216; overflow: hidden;
   border: 0.5px solid var(--line); box-shadow: 0 30px 80px rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
 }
-.lp-frame.tall { aspect-ratio: 10 / 13; max-width: 320px; }
-.lp-frame-label { color: var(--mut); font-size: 13px; }
+.lp-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+.lp-frame.tall { max-width: 300px; }
+.lp-view .lp-frame { max-width: 232px; margin: 0 auto; }
 
 /* tagline / differentiator */
 .lp-tagline { padding: 56px 0; text-align: center; border-top: 0.5px solid var(--line); }
@@ -267,7 +267,8 @@ const roadmapSoon = ['iOS App', 'Android App', 'Push Notifications']
   .lp-hero-text h1 { font-size: 40px; letter-spacing: -1px; }
   .lp-hero-text p { font-size: 17px; }
   .lp-hero-shot { margin-top: 36px; }
-  .lp-frame.tall { max-width: 280px; aspect-ratio: 10 / 14; }
+  .lp-frame.tall { max-width: 270px; }
+  .lp-view .lp-frame { max-width: 270px; }
 
   /* tagline */
   .lp-tagline { padding: 44px 0; }
